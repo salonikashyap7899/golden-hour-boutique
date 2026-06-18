@@ -64,7 +64,7 @@ function Shop() {
               {(["all", "women", "men", "accessories"] as const).map((c) => (
                 <li key={c}>
                   <button
-                    onClick={() => navigate({ search: (p) => ({ ...p, category: c }) })}
+                    onClick={() => navigate({ search: (p: Search) => ({ ...p, category: c }) })}
                     className={`link-underline ${category === c ? "text-foreground font-medium" : "text-muted-foreground"}`}
                   >
                     {CAT_LABEL[c]}
@@ -87,7 +87,7 @@ function Shop() {
             <div className="flex flex-wrap gap-2">
               {category !== "all" && (
                 <button
-                  onClick={() => navigate({ search: (p) => ({ ...p, category: "all" }) })}
+                  onClick={() => navigate({ search: (p: Search) => ({ ...p, category: "all" as const }) })}
                   className="inline-flex items-center gap-1.5 text-[11px] tracking-[0.18em] uppercase border hairline px-3 py-1.5"
                 >
                   {CAT_LABEL[category]} <X className="h-3 w-3" />
@@ -104,7 +104,7 @@ function Shop() {
             <div className="relative">
               <select
                 value={sort}
-                onChange={(e) => navigate({ search: (p) => ({ ...p, sort: e.target.value as Search["sort"] }) })}
+                onChange={(e) => navigate({ search: (p: Search) => ({ ...p, sort: e.target.value as Search["sort"] }) })}
                 className="appearance-none bg-transparent border hairline pl-4 pr-10 py-2 text-eyebrow cursor-pointer focus:outline-none focus:border-accent"
               >
                 <option value="newest">Newest</option>

@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Heart, Minus, Plus, Star, Truck, RotateCcw, Shield } from "lucide-react";
-import { findProduct, formatINR, PRODUCTS } from "@/lib/products";
+import { findProduct, formatINR, PRODUCTS, type Product } from "@/lib/products";
 import { useCart } from "@/lib/cart";
 import { ProductCard } from "@/components/site/ProductCard";
 
@@ -45,7 +45,7 @@ export const Route = createFileRoute("/product/$slug")({
 });
 
 function ProductDetail() {
-  const { product } = Route.useLoaderData();
+  const { product } = Route.useLoaderData() as { product: Product };
   const navigate = useNavigate();
   const { add } = useCart();
   const [size, setSize] = useState(product.sizes[0]);
