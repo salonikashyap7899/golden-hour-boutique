@@ -1,9 +1,14 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Heart, Minus, Plus, Star, Truck, RotateCcw, Shield } from "lucide-react";
+import { Heart, Minus, Plus, Star, Truck, RotateCcw, Shield, Loader2 } from "lucide-react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { findProduct, formatINR, PRODUCTS, type Product } from "@/lib/products";
 import { useCart } from "@/lib/cart";
 import { ProductCard } from "@/components/site/ProductCard";
+import { useAuth } from "@/lib/auth";
+import { toggleWishlist, isInWishlist } from "@/lib/api/wishlist.functions";
+import { listReviewsForSlug, submitReview } from "@/lib/api/reviews.functions";
 
 export const Route = createFileRoute("/product/$slug")({
   loader: ({ params }) => {
@@ -153,7 +158,7 @@ function ProductDetail() {
               <button onClick={() => setQty(qty + 1)} className="h-12 w-12 grid place-items-center hover:bg-secondary"><Plus className="h-3.5 w-3.5" /></button>
             </div>
             <button onClick={() => handleAdd(false)} className="btn-outline-dark flex-1 !rounded-none h-12">Add to bag</button>
-            <button aria-label="Wishlist" className="h-12 w-12 border hairline grid place-items-center hover:text-accent hover:border-accent transition-colors"><Heart className="h-4 w-4" /></button>
+            <WishlistHeart slug={product.slug} />
           </div>
           <button onClick={() => handleAdd(true)} className="btn-gold w-full mt-3 !rounded-none">Buy now</button>
 
@@ -201,12 +206,7 @@ function ProductDetail() {
                   <li>30-day returns. Items must be unworn with tags attached.</li>
                 </ul>
               )}
-              {tab === "reviews" && (
-                <div>
-                  <div className="text-foreground text-lg">{product.rating}/5 · based on {product.reviews} reviews</div>
-                  <p className="mt-2">Full review system coming in a later build pass.</p>
-                </div>
-              )}
+              {tab === "reviews" && <ReviewsPanel slug={product.slug} />}
             </div>
           </div>
         </div>
@@ -219,6 +219,97 @@ function ProductDetail() {
           <h2 className="text-display text-3xl md:text-4xl mb-10">You may also love</h2>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-10 md:gap-x-6">
             {related.map((p) => <ProductCard key={p.id} product={p} />)}
+          </div>
+        </section>
+      )}
+    </main>
+  );
+}
+
+function WishlistHeart({ slug }: { slug: string }) {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const check = useServerFn(isInWishlist);
+  const toggle = useServerFn(toggleWishlist);
+  const q = useQuery({ queryKey: ["wishlist", slug], queryFn: () => check({ data: { slug } }), enabled: !!user });
+  const m = useMutation({ mutationFn: () => toggle({ data: { slug } }), onSuccess: () => q.refetch() });
+  const inWish = q.data?.in_wishlist;
+  return (
+    <button
+      aria-label="Wishlist"
+      onClick={() => user ? m.mutate() : navigate({ to: "/auth" })}
+      className={`h-12 w-12 border hairline grid place-items-center transition-colors ${inWish ? "text-accent border-accent" : "hover:text-accent hover:border-accent"}`}
+    >
+      <Heart className={`h-4 w-4 ${inWish ? "fill-accent" : ""}`} />
+    </button>
+  );
+}
+
+function ReviewsPanel({ slug }: { slug: string }) {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const listFn = useServerFn(listReviewsForSlug);
+  const submitFn = useServerFn(submitReview);
+  const q = useQuery({ queryKey: ["reviews", slug], queryFn: () => listFn({ data: { slug } }) });
+  const [open, setOpen] = useState(false);
+  const [rating, setRating] = useState(5);
+  const [title, setTitle] = useState("");
+  const [body, setBody] = useState("");
+  const [err, setErr] = useState<string | null>(null);
+  const m = useMutation({
+    mutationFn: () => submitFn({ data: { slug, rating, title: title || undefined, body: body || undefined } }),
+    onSuccess: () => { setOpen(false); setTitle(""); setBody(""); q.refetch(); },
+    onError: (e: any) => setErr(e.message),
+  });
+
+  return (
+    <div className="space-y-6">
+      {q.isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : (
+        <>
+          <div className="flex items-baseline gap-3">
+            <span className="text-foreground text-2xl">{q.data?.rating_avg?.toFixed(1) ?? "—"}/5</span>
+            <span className="text-xs">based on {q.data?.rating_count ?? 0} reviews</span>
+          </div>
+          <button onClick={() => user ? setOpen(true) : navigate({ to: "/auth" })} className="btn-outline-dark">Write a review</button>
+          {open && (
+            <div className="border hairline p-5 space-y-3">
+              <div className="flex gap-1">
+                {[1,2,3,4,5].map(n => (
+                  <button key={n} onClick={() => setRating(n)}>
+                    <Star className={`h-5 w-5 ${n <= rating ? "fill-accent text-accent" : "text-muted-foreground"}`} />
+                  </button>
+                ))}
+              </div>
+              <input value={title} onChange={(e)=>setTitle(e.target.value)} placeholder="Headline (optional)" className="w-full bg-background border hairline px-3 py-2 text-sm"/>
+              <textarea value={body} onChange={(e)=>setBody(e.target.value)} rows={3} placeholder="What did you love?" className="w-full bg-background border hairline px-3 py-2 text-sm"/>
+              {err && <div className="text-xs text-destructive">{err}</div>}
+              <div className="flex gap-3">
+                <button onClick={() => m.mutate()} disabled={m.isPending} className="btn-gold">{m.isPending ? "Sending…" : "Submit"}</button>
+                <button onClick={() => setOpen(false)} className="btn-outline-dark">Cancel</button>
+              </div>
+            </div>
+          )}
+          <ul className="space-y-5">
+            {q.data?.reviews.map((r) => (
+              <li key={r.id} className="border-b hairline pb-5">
+                <div className="flex items-center gap-2">
+                  {Array.from({length:5}).map((_,i) => (
+                    <Star key={i} className={`h-3 w-3 ${i < r.rating ? "fill-accent text-accent" : "text-muted-foreground"}`} />
+                  ))}
+                  <span className="text-xs text-foreground ml-2">{r.author}</span>
+                  {r.is_verified_purchase && <span className="text-[10px] uppercase tracking-widest text-accent">Verified</span>}
+                </div>
+                {r.title && <div className="text-sm text-foreground mt-2">{r.title}</div>}
+                {r.body && <p className="mt-1">{r.body}</p>}
+                <div className="text-[10px] text-muted-foreground mt-2">{new Date(r.created_at).toLocaleDateString()}</div>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+    </div>
+  );
+}
           </div>
         </section>
       )}
