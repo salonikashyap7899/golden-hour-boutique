@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { CartProvider } from "@/lib/cart";
+import { AuthProvider } from "@/lib/auth";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 
@@ -82,11 +83,13 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   return (
     <QueryClientProvider client={queryClient}>
-      <CartProvider>
-        <Header />
-        <Outlet />
-        <Footer />
-      </CartProvider>
+      <AuthProvider>
+        <CartProvider>
+          <Header />
+          <Outlet />
+          <Footer />
+        </CartProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

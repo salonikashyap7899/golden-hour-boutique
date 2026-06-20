@@ -1,9 +1,11 @@
 import { Link } from "@tanstack/react-router";
 import { Search, Heart, ShoppingBag, User } from "lucide-react";
 import { useCart } from "@/lib/cart";
+import { useAuth } from "@/lib/auth";
 
 export function Header() {
   const { count } = useCart();
+  const { user } = useAuth();
   return (
     <header className="sticky top-0 z-40 bg-background/85 backdrop-blur-xl border-b hairline">
       <div className="hidden md:flex justify-center text-eyebrow py-2 text-muted-foreground">
@@ -23,8 +25,12 @@ export function Header() {
 
         <div className="flex items-center gap-5 text-foreground">
           <button aria-label="Search" className="hover:text-accent transition-colors"><Search className="h-[18px] w-[18px]" /></button>
-          <button aria-label="Account" className="hidden md:inline-flex hover:text-accent transition-colors"><User className="h-[18px] w-[18px]" /></button>
-          <button aria-label="Wishlist" className="hidden md:inline-flex hover:text-accent transition-colors"><Heart className="h-[18px] w-[18px]" /></button>
+          <Link to={user ? "/account" : "/auth"} aria-label="Account" className="hidden md:inline-flex hover:text-accent transition-colors">
+            <User className="h-[18px] w-[18px]" />
+          </Link>
+          <Link to={user ? "/account" : "/auth"} aria-label="Wishlist" className="hidden md:inline-flex hover:text-accent transition-colors">
+            <Heart className="h-[18px] w-[18px]" />
+          </Link>
           <Link to="/cart" aria-label="Cart" className="relative hover:text-accent transition-colors">
             <ShoppingBag className="h-[18px] w-[18px]" />
             {count > 0 && (

@@ -11,8 +11,15 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ShopRouteImport } from './routes/shop'
 import { Route as CartRouteImport } from './routes/cart'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
+import { Route as AuthenticatedCheckoutRouteImport } from './routes/_authenticated/checkout'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
+import { Route as ApiPublicRazorpayWebhookRouteImport } from './routes/api/public/razorpay-webhook'
+import { Route as AuthenticatedAccountOrdersIdRouteImport } from './routes/_authenticated/account.orders.$id'
 
 const ShopRoute = ShopRouteImport.update({
   id: '/shop',
@@ -22,6 +29,15 @@ const ShopRoute = ShopRouteImport.update({
 const CartRoute = CartRouteImport.update({
   id: '/cart',
   path: '/cart',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -34,39 +50,120 @@ const ProductSlugRoute = ProductSlugRouteImport.update({
   path: '/product/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedCheckoutRoute = AuthenticatedCheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAccountRoute = AuthenticatedAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const ApiPublicRazorpayWebhookRoute =
+  ApiPublicRazorpayWebhookRouteImport.update({
+    id: '/api/public/razorpay-webhook',
+    path: '/api/public/razorpay-webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AuthenticatedAccountOrdersIdRoute =
+  AuthenticatedAccountOrdersIdRouteImport.update({
+    id: '/orders/$id',
+    path: '/orders/$id',
+    getParentRoute: () => AuthenticatedAccountRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
   '/shop': typeof ShopRoute
+  '/account': typeof AuthenticatedAccountRouteWithChildren
+  '/admin': typeof AuthenticatedAdminRoute
+  '/checkout': typeof AuthenticatedCheckoutRoute
   '/product/$slug': typeof ProductSlugRoute
+  '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
+  '/account/orders/$id': typeof AuthenticatedAccountOrdersIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
   '/shop': typeof ShopRoute
+  '/account': typeof AuthenticatedAccountRouteWithChildren
+  '/admin': typeof AuthenticatedAdminRoute
+  '/checkout': typeof AuthenticatedCheckoutRoute
   '/product/$slug': typeof ProductSlugRoute
+  '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
+  '/account/orders/$id': typeof AuthenticatedAccountOrdersIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
   '/shop': typeof ShopRoute
+  '/_authenticated/account': typeof AuthenticatedAccountRouteWithChildren
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/checkout': typeof AuthenticatedCheckoutRoute
   '/product/$slug': typeof ProductSlugRoute
+  '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
+  '/_authenticated/account/orders/$id': typeof AuthenticatedAccountOrdersIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/cart' | '/shop' | '/product/$slug'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/cart'
+    | '/shop'
+    | '/account'
+    | '/admin'
+    | '/checkout'
+    | '/product/$slug'
+    | '/api/public/razorpay-webhook'
+    | '/account/orders/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/cart' | '/shop' | '/product/$slug'
-  id: '__root__' | '/' | '/cart' | '/shop' | '/product/$slug'
+  to:
+    | '/'
+    | '/auth'
+    | '/cart'
+    | '/shop'
+    | '/account'
+    | '/admin'
+    | '/checkout'
+    | '/product/$slug'
+    | '/api/public/razorpay-webhook'
+    | '/account/orders/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/cart'
+    | '/shop'
+    | '/_authenticated/account'
+    | '/_authenticated/admin'
+    | '/_authenticated/checkout'
+    | '/product/$slug'
+    | '/api/public/razorpay-webhook'
+    | '/_authenticated/account/orders/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
   CartRoute: typeof CartRoute
   ShopRoute: typeof ShopRoute
   ProductSlugRoute: typeof ProductSlugRoute
+  ApiPublicRazorpayWebhookRoute: typeof ApiPublicRazorpayWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -85,6 +182,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CartRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -99,14 +210,78 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/checkout': {
+      id: '/_authenticated/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof AuthenticatedCheckoutRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/account': {
+      id: '/_authenticated/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AuthenticatedAccountRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/api/public/razorpay-webhook': {
+      id: '/api/public/razorpay-webhook'
+      path: '/api/public/razorpay-webhook'
+      fullPath: '/api/public/razorpay-webhook'
+      preLoaderRoute: typeof ApiPublicRazorpayWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/account/orders/$id': {
+      id: '/_authenticated/account/orders/$id'
+      path: '/orders/$id'
+      fullPath: '/account/orders/$id'
+      preLoaderRoute: typeof AuthenticatedAccountOrdersIdRouteImport
+      parentRoute: typeof AuthenticatedAccountRoute
+    }
   }
 }
 
+interface AuthenticatedAccountRouteChildren {
+  AuthenticatedAccountOrdersIdRoute: typeof AuthenticatedAccountOrdersIdRoute
+}
+
+const AuthenticatedAccountRouteChildren: AuthenticatedAccountRouteChildren = {
+  AuthenticatedAccountOrdersIdRoute: AuthenticatedAccountOrdersIdRoute,
+}
+
+const AuthenticatedAccountRouteWithChildren =
+  AuthenticatedAccountRoute._addFileChildren(AuthenticatedAccountRouteChildren)
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAccountRoute: typeof AuthenticatedAccountRouteWithChildren
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedCheckoutRoute: typeof AuthenticatedCheckoutRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAccountRoute: AuthenticatedAccountRouteWithChildren,
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedCheckoutRoute: AuthenticatedCheckoutRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
   CartRoute: CartRoute,
   ShopRoute: ShopRoute,
   ProductSlugRoute: ProductSlugRoute,
+  ApiPublicRazorpayWebhookRoute: ApiPublicRazorpayWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
