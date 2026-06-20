@@ -310,9 +310,3 @@ function ReviewsPanel({ slug }: { slug: string }) {
     </div>
   );
 }
-          </div>
-        </section>
-      )}
-    </main>
-  );
-}
