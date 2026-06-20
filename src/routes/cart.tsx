@@ -101,8 +101,8 @@ function CartPage() {
               <div className="text-xs text-muted-foreground mt-2">Inclusive of all taxes</div>
             </div>
 
-            <button className="btn-gold w-full mt-4">Proceed to checkout <ArrowRight className="h-4 w-4" /></button>
-            <div className="text-[11px] text-center text-muted-foreground mt-3">Checkout, OTP login & Razorpay payments coming in the next build pass.</div>
+            <Link to="/checkout" className="btn-gold w-full mt-4">Proceed to checkout <ArrowRight className="h-4 w-4" /></Link>
+            <div className="text-[11px] text-center text-muted-foreground mt-3">Secured by Razorpay · OTP sign-in on next step</div>
           </div>
         </aside>
       </div>

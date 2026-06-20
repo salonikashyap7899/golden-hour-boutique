@@ -182,10 +182,8 @@ export const verifyPayment = createServerFn({ method: "POST" })
 
     await supabaseAdmin.from("order_status_history").insert({ order_id: data.order_id, status: "confirmed", note: "Payment verified" });
 
-    // Decrement coupon usage
+    // Increment coupon usage
     if (order.coupon_code) {
-      await supabaseAdmin.rpc("exec", {}); // no-op safeguard if rpc absent
-      // Manual increment
       const { data: c } = await supabaseAdmin.from("coupons").select("id, used_count").eq("code", order.coupon_code).maybeSingle();
       if (c) await supabaseAdmin.from("coupons").update({ used_count: (c.used_count ?? 0) + 1 }).eq("id", c.id);
     }
