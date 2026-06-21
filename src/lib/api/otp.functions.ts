@@ -68,13 +68,7 @@ export const sendPhoneOtp = createServerFn({ method: "POST" })
       expires_at: new Date(Date.now() + 5 * 60_000).toISOString(),
     });
 
-    try {
-      await sendTwilioSms(phone, `Your Maison verification code is ${otp}. Valid for 5 minutes.`);
-    } catch (e) {
-      console.error("Twilio send failed:", e);
-      // In dev / unconfigured Twilio, surface the OTP via logs so testing works
-      console.warn(`[DEV OTP] ${phone} -> ${otp}`);
-    }
+    await sendTwilioSms(phone, `Your Maison verification code is ${otp}. Valid for 5 minutes.`);
     return { ok: true };
   });
 
