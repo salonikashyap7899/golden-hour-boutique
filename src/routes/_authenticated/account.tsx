@@ -130,8 +130,21 @@ function AddressForm({ onSaved, onCancel }: { onSaved: () => void; onCancel: () 
   const save = useServerFn(saveAddress);
   const [v, setV] = useState({ full_name: "", phone: "", line1: "", line2: "", city: "", state: "", pincode: "", country: "IN", is_default: false });
   const [err, setErr] = useState<string|null>(null);
+  const [looking, setLooking] = useState(false);
+
+  async function onPin(p: string) {
+    setV((s) => ({ ...s, pincode: p }));
+    if (/^\d{6}$/.test(p)) {
+      setLooking(true);
+      const { lookupPincode } = await import("@/lib/utils/pincode");
+      const r = await lookupPincode(p);
+      setLooking(false);
+      if (r) setV((s) => ({ ...s, pincode: p, city: r.city, state: r.state }));
+    }
+  }
+
   return (
-    <div className="border hairline p-6 space-y-3">
+    <div className="border hairline p-6 space-y-3 animate-fade-up">
       <div className="grid grid-cols-2 gap-3">
         <Input label="Full name" value={v.full_name} on={(x)=>setV({...v,full_name:x})}/>
         <Input label="Phone" value={v.phone} on={(x)=>setV({...v,phone:x})}/>
@@ -139,9 +152,12 @@ function AddressForm({ onSaved, onCancel }: { onSaved: () => void; onCancel: () 
       <Input label="Address line 1" value={v.line1} on={(x)=>setV({...v,line1:x})}/>
       <Input label="Address line 2" value={v.line2} on={(x)=>setV({...v,line2:x})}/>
       <div className="grid grid-cols-3 gap-3">
+        <label className="block">
+          <span className="text-eyebrow block mb-1">Pincode {looking && <span className="text-accent ml-2">…</span>}</span>
+          <input value={v.pincode} onChange={(e)=>onPin(e.target.value)} maxLength={6} className="w-full bg-background border hairline px-3 py-2 text-sm focus:outline-none focus:border-foreground"/>
+        </label>
         <Input label="City" value={v.city} on={(x)=>setV({...v,city:x})}/>
         <Input label="State" value={v.state} on={(x)=>setV({...v,state:x})}/>
-        <Input label="Pincode" value={v.pincode} on={(x)=>setV({...v,pincode:x})}/>
       </div>
       <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={v.is_default} onChange={(e)=>setV({...v,is_default:e.target.checked})}/> Set as default</label>
       {err && <div className="text-xs text-destructive">{err}</div>}

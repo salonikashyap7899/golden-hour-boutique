@@ -467,6 +467,7 @@ export type Database = {
           price: number
           rating_avg: number
           rating_count: number
+          seller_id: string | null
           slug: string
           title: string
           updated_at: string
@@ -485,6 +486,7 @@ export type Database = {
           price: number
           rating_avg?: number
           rating_count?: number
+          seller_id?: string | null
           slug: string
           title: string
           updated_at?: string
@@ -503,6 +505,7 @@ export type Database = {
           price?: number
           rating_avg?: number
           rating_count?: number
+          seller_id?: string | null
           slug?: string
           title?: string
           updated_at?: string
@@ -513,6 +516,13 @@ export type Database = {
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "sellers"
             referencedColumns: ["id"]
           },
         ]
@@ -648,6 +658,117 @@ export type Database = {
           },
         ]
       }
+      seller_subscriptions: {
+        Row: {
+          cancel_at_period_end: boolean
+          created_at: string
+          current_period_end: string
+          current_period_start: string
+          id: string
+          plan_id: string
+          razorpay_subscription_id: string | null
+          seller_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          cancel_at_period_end?: boolean
+          created_at?: string
+          current_period_end?: string
+          current_period_start?: string
+          id?: string
+          plan_id: string
+          razorpay_subscription_id?: string | null
+          seller_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          cancel_at_period_end?: boolean
+          created_at?: string
+          current_period_end?: string
+          current_period_start?: string
+          id?: string
+          plan_id?: string
+          razorpay_subscription_id?: string | null
+          seller_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seller_subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "seller_subscriptions_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "sellers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sellers: {
+        Row: {
+          bank_account: Json | null
+          brand_name: string
+          commission_rate: number
+          created_at: string
+          description: string | null
+          gst_number: string | null
+          id: string
+          logo_url: string | null
+          pan_number: string | null
+          pickup_address: Json | null
+          rating_avg: number | null
+          rating_count: number | null
+          slug: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          bank_account?: Json | null
+          brand_name: string
+          commission_rate?: number
+          created_at?: string
+          description?: string | null
+          gst_number?: string | null
+          id?: string
+          logo_url?: string | null
+          pan_number?: string | null
+          pickup_address?: Json | null
+          rating_avg?: number | null
+          rating_count?: number | null
+          slug: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          bank_account?: Json | null
+          brand_name?: string
+          commission_rate?: number
+          created_at?: string
+          description?: string | null
+          gst_number?: string | null
+          id?: string
+          logo_url?: string | null
+          pan_number?: string | null
+          pickup_address?: Json | null
+          rating_avg?: number | null
+          rating_count?: number | null
+          slug?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       shipments: {
         Row: {
           courier: string | null
@@ -691,6 +812,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      subscription_plans: {
+        Row: {
+          code: string
+          commission_rate: number
+          created_at: string
+          description: string | null
+          features: Json
+          id: string
+          is_active: boolean
+          name: string
+          price_monthly: number
+          product_limit: number | null
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          commission_rate?: number
+          created_at?: string
+          description?: string | null
+          features?: Json
+          id?: string
+          is_active?: boolean
+          name: string
+          price_monthly?: number
+          product_limit?: number | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          commission_rate?: number
+          created_at?: string
+          description?: string | null
+          features?: Json
+          id?: string
+          is_active?: boolean
+          name?: string
+          price_monthly?: number
+          product_limit?: number | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
@@ -758,7 +924,7 @@ export type Database = {
       refresh_product_rating: { Args: { _pid: string }; Returns: undefined }
     }
     Enums: {
-      app_role: "admin" | "customer"
+      app_role: "admin" | "customer" | "seller"
       order_status:
         | "pending"
         | "confirmed"
@@ -907,7 +1073,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "customer"],
+      app_role: ["admin", "customer", "seller"],
       order_status: [
         "pending",
         "confirmed",
