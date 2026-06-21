@@ -10,11 +10,15 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ShopRouteImport } from './routes/shop'
+import { Route as SellRouteImport } from './routes/sell'
+import { Route as SearchRouteImport } from './routes/search'
+import { Route as PlansRouteImport } from './routes/plans'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
+import { Route as AuthenticatedSellerRouteImport } from './routes/_authenticated/seller'
 import { Route as AuthenticatedCheckoutRouteImport } from './routes/_authenticated/checkout'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
@@ -24,6 +28,21 @@ import { Route as AuthenticatedAccountOrdersIdRouteImport } from './routes/_auth
 const ShopRoute = ShopRouteImport.update({
   id: '/shop',
   path: '/shop',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SellRoute = SellRouteImport.update({
+  id: '/sell',
+  path: '/sell',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SearchRoute = SearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlansRoute = PlansRouteImport.update({
+  id: '/plans',
+  path: '/plans',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CartRoute = CartRouteImport.update({
@@ -49,6 +68,11 @@ const ProductSlugRoute = ProductSlugRouteImport.update({
   id: '/product/$slug',
   path: '/product/$slug',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedSellerRoute = AuthenticatedSellerRouteImport.update({
+  id: '/seller',
+  path: '/seller',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedCheckoutRoute = AuthenticatedCheckoutRouteImport.update({
   id: '/checkout',
@@ -82,10 +106,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
+  '/plans': typeof PlansRoute
+  '/search': typeof SearchRoute
+  '/sell': typeof SellRoute
   '/shop': typeof ShopRoute
   '/account': typeof AuthenticatedAccountRouteWithChildren
   '/admin': typeof AuthenticatedAdminRoute
   '/checkout': typeof AuthenticatedCheckoutRoute
+  '/seller': typeof AuthenticatedSellerRoute
   '/product/$slug': typeof ProductSlugRoute
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
   '/account/orders/$id': typeof AuthenticatedAccountOrdersIdRoute
@@ -94,10 +122,14 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
+  '/plans': typeof PlansRoute
+  '/search': typeof SearchRoute
+  '/sell': typeof SellRoute
   '/shop': typeof ShopRoute
   '/account': typeof AuthenticatedAccountRouteWithChildren
   '/admin': typeof AuthenticatedAdminRoute
   '/checkout': typeof AuthenticatedCheckoutRoute
+  '/seller': typeof AuthenticatedSellerRoute
   '/product/$slug': typeof ProductSlugRoute
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
   '/account/orders/$id': typeof AuthenticatedAccountOrdersIdRoute
@@ -108,10 +140,14 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
+  '/plans': typeof PlansRoute
+  '/search': typeof SearchRoute
+  '/sell': typeof SellRoute
   '/shop': typeof ShopRoute
   '/_authenticated/account': typeof AuthenticatedAccountRouteWithChildren
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/checkout': typeof AuthenticatedCheckoutRoute
+  '/_authenticated/seller': typeof AuthenticatedSellerRoute
   '/product/$slug': typeof ProductSlugRoute
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
   '/_authenticated/account/orders/$id': typeof AuthenticatedAccountOrdersIdRoute
@@ -122,10 +158,14 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/cart'
+    | '/plans'
+    | '/search'
+    | '/sell'
     | '/shop'
     | '/account'
     | '/admin'
     | '/checkout'
+    | '/seller'
     | '/product/$slug'
     | '/api/public/razorpay-webhook'
     | '/account/orders/$id'
@@ -134,10 +174,14 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/cart'
+    | '/plans'
+    | '/search'
+    | '/sell'
     | '/shop'
     | '/account'
     | '/admin'
     | '/checkout'
+    | '/seller'
     | '/product/$slug'
     | '/api/public/razorpay-webhook'
     | '/account/orders/$id'
@@ -147,10 +191,14 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/cart'
+    | '/plans'
+    | '/search'
+    | '/sell'
     | '/shop'
     | '/_authenticated/account'
     | '/_authenticated/admin'
     | '/_authenticated/checkout'
+    | '/_authenticated/seller'
     | '/product/$slug'
     | '/api/public/razorpay-webhook'
     | '/_authenticated/account/orders/$id'
@@ -161,6 +209,9 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   CartRoute: typeof CartRoute
+  PlansRoute: typeof PlansRoute
+  SearchRoute: typeof SearchRoute
+  SellRoute: typeof SellRoute
   ShopRoute: typeof ShopRoute
   ProductSlugRoute: typeof ProductSlugRoute
   ApiPublicRazorpayWebhookRoute: typeof ApiPublicRazorpayWebhookRoute
@@ -173,6 +224,27 @@ declare module '@tanstack/react-router' {
       path: '/shop'
       fullPath: '/shop'
       preLoaderRoute: typeof ShopRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sell': {
+      id: '/sell'
+      path: '/sell'
+      fullPath: '/sell'
+      preLoaderRoute: typeof SellRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/plans': {
+      id: '/plans'
+      path: '/plans'
+      fullPath: '/plans'
+      preLoaderRoute: typeof PlansRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cart': {
@@ -209,6 +281,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/product/$slug'
       preLoaderRoute: typeof ProductSlugRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/seller': {
+      id: '/_authenticated/seller'
+      path: '/seller'
+      fullPath: '/seller'
+      preLoaderRoute: typeof AuthenticatedSellerRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/checkout': {
       id: '/_authenticated/checkout'
@@ -263,12 +342,14 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAccountRoute: typeof AuthenticatedAccountRouteWithChildren
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedCheckoutRoute: typeof AuthenticatedCheckoutRoute
+  AuthenticatedSellerRoute: typeof AuthenticatedSellerRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAccountRoute: AuthenticatedAccountRouteWithChildren,
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedCheckoutRoute: AuthenticatedCheckoutRoute,
+  AuthenticatedSellerRoute: AuthenticatedSellerRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -279,6 +360,9 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   CartRoute: CartRoute,
+  PlansRoute: PlansRoute,
+  SearchRoute: SearchRoute,
+  SellRoute: SellRoute,
   ShopRoute: ShopRoute,
   ProductSlugRoute: ProductSlugRoute,
   ApiPublicRazorpayWebhookRoute: ApiPublicRazorpayWebhookRoute,
