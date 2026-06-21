@@ -177,7 +177,8 @@ export const upsertSellerProduct = createServerFn({ method: "POST" })
     const slug = slugify(data.title) + "-" + Math.floor(Math.random() * 9000 + 1000);
 
     if (data.id) {
-      const { data: row, error } = await context.supabase
+      const sb: any = context.supabase;
+      const { data: row, error } = await sb
         .from("products")
         .update({
           title: data.title,
@@ -192,13 +193,13 @@ export const upsertSellerProduct = createServerFn({ method: "POST" })
         .select()
         .single();
       if (error) throw new Error(error.message);
-      // Reset primary image
-      await context.supabase.from("product_images").delete().eq("product_id", data.id);
-      await context.supabase.from("product_images").insert({ product_id: data.id, url: data.image_url, position: 0 });
+      await sb.from("product_images").delete().eq("product_id", data.id);
+      await sb.from("product_images").insert({ product_id: data.id, url: data.image_url, position: 0 });
       return row;
     }
 
-    const { data: row, error } = await context.supabase
+    const sb: any = context.supabase;
+    const { data: row, error } = await sb
       .from("products")
       .insert({
         seller_id: seller.id,
@@ -214,7 +215,7 @@ export const upsertSellerProduct = createServerFn({ method: "POST" })
       .select()
       .single();
     if (error) throw new Error(error.message);
-    await context.supabase.from("product_images").insert({ product_id: row.id, url: data.image_url, position: 0 });
+    await sb.from("product_images").insert({ product_id: row.id, url: data.image_url, position: 0 });
     return row;
   });
 
