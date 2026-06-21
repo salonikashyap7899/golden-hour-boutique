@@ -17,7 +17,20 @@ function synthEmail(phone: string) {
 async function sendTwilioSms(to: string, body: string) {
   const key = process.env.LOVABLE_API_KEY;
   const conn = process.env.TWILIO_API_KEY;
-  if (!key || !conn) throw new Error("Twilio not configured");
+  if (!key || !conn) throw new Error("Twilio connector not configured");
+
+  const from = process.env.TWILIO_FROM_NUMBER?.trim();
+  const msid = process.env.TWILIO_MESSAGING_SERVICE_SID?.trim();
+  if (!from && !msid) {
+    throw new Error(
+      "Twilio sender not configured. Add TWILIO_FROM_NUMBER (E.164, e.g. +15558675310) or TWILIO_MESSAGING_SERVICE_SID as a secret.",
+    );
+  }
+
+  const params: Record<string, string> = { To: to, Body: body };
+  if (msid) params.MessagingServiceSid = msid;
+  else if (from) params.From = from;
+
   const res = await fetch("https://connector-gateway.lovable.dev/twilio/Messages.json", {
     method: "POST",
     headers: {
@@ -25,26 +38,11 @@ async function sendTwilioSms(to: string, body: string) {
       "X-Connection-Api-Key": conn,
       "Content-Type": "application/x-www-form-urlencoded",
     },
-    body: new URLSearchParams({ To: to, Body: body, MessagingServiceSid: process.env.TWILIO_MESSAGING_SERVICE_SID ?? "" }).toString().replace(/MessagingServiceSid=&?/, ""),
+    body: new URLSearchParams(params).toString(),
   });
   if (!res.ok) {
     const t = await res.text();
-    // Try with From fallback
-    const from = process.env.TWILIO_FROM_NUMBER;
-    if (from) {
-      const r2 = await fetch("https://connector-gateway.lovable.dev/twilio/Messages.json", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${key}`,
-          "X-Connection-Api-Key": conn,
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: new URLSearchParams({ To: to, From: from, Body: body }),
-      });
-      if (!r2.ok) throw new Error(`Twilio: ${await r2.text()}`);
-      return;
-    }
-    throw new Error(`Twilio: ${t}`);
+    throw new Error(`Twilio ${res.status}: ${t}`);
   }
 }
 
