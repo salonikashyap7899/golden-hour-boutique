@@ -2,12 +2,13 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { Package, MapPin, Heart, RotateCcw, LogOut, ChevronRight, Plus, Trash2 } from "lucide-react";
+import { Package, MapPin, Heart, RotateCcw, LogOut, ChevronRight, Plus, Trash2, Activity, ShoppingBag, CreditCard, LogIn, Star, UserPlus } from "lucide-react";
 import { listMyOrders } from "@/lib/api/orders.functions";
 import { listAddresses, saveAddress, deleteAddress } from "@/lib/api/addresses.functions";
 import { listMyReturns } from "@/lib/api/returns.functions";
 import { listWishlist } from "@/lib/api/wishlist.functions";
 import { checkIsAdmin, bootstrapAdmin } from "@/lib/api/admin.functions";
+import { getMyActivity, type ActivityEvent } from "@/lib/api/activity.functions";
 import { useAuth } from "@/lib/auth";
 import { formatINR } from "@/lib/products";
 
@@ -16,38 +17,56 @@ export const Route = createFileRoute("/_authenticated/account")({
   component: AccountPage,
 });
 
-type Tab = "orders" | "addresses" | "wishlist" | "returns";
+type Tab = "activity" | "orders" | "addresses" | "wishlist" | "returns";
 
 function AccountPage() {
   const { user, signOut } = useAuth();
-  const [tab, setTab] = useState<Tab>("orders");
+  const [tab, setTab] = useState<Tab>("activity");
 
   const ordersFn = useServerFn(listMyOrders);
   const addrFn = useServerFn(listAddresses);
   const retFn = useServerFn(listMyReturns);
   const wishFn = useServerFn(listWishlist);
   const adminFn = useServerFn(checkIsAdmin);
+  const actFn = useServerFn(getMyActivity);
 
   const orders = useQuery({ queryKey: ["my-orders"], queryFn: () => ordersFn() });
   const addresses = useQuery({ queryKey: ["my-addresses"], queryFn: () => addrFn() });
   const returns = useQuery({ queryKey: ["my-returns"], queryFn: () => retFn() });
   const wishlist = useQuery({ queryKey: ["my-wishlist"], queryFn: () => wishFn() });
   const admin = useQuery({ queryKey: ["is-admin"], queryFn: () => adminFn() });
+  const activity = useQuery({ queryKey: ["my-activity"], queryFn: () => actFn() });
+
+  const stats = [
+    { label: "Orders", value: orders.data?.length ?? 0 },
+    { label: "Wishlist", value: wishlist.data?.length ?? 0 },
+    { label: "Addresses", value: addresses.data?.length ?? 0 },
+    { label: "Returns", value: returns.data?.length ?? 0 },
+  ];
 
   return (
     <main className="mx-auto max-w-[1400px] px-6 lg:px-10 pt-12 pb-24">
-      <div className="border-b hairline pb-8 mb-10">
+      <div className="border-b hairline pb-8 mb-10 animate-fade-up">
         <div className="text-eyebrow text-accent">Account</div>
         <h1 className="text-display text-5xl mt-3">{user?.user_metadata?.full_name || "Welcome"}</h1>
         <div className="text-sm text-muted-foreground mt-2">{user?.user_metadata?.phone ?? user?.email}</div>
+        <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-3 max-w-2xl">
+          {stats.map((s) => (
+            <div key={s.label} className="border hairline px-5 py-4">
+              <div className="text-eyebrow text-muted-foreground">{s.label}</div>
+              <div className="text-3xl font-serif mt-1">{s.value}</div>
+            </div>
+          ))}
+        </div>
       </div>
 
       <div className="grid lg:grid-cols-[260px_1fr] gap-12">
         <nav className="space-y-1 text-sm">
-          {(["orders","addresses","wishlist","returns"] as Tab[]).map((t) => (
+          {(["activity","orders","addresses","wishlist","returns"] as Tab[]).map((t) => (
             <button key={t} onClick={() => setTab(t)}
-              className={`w-full flex items-center justify-between py-3 px-4 border-l-2 ${tab===t?"border-accent bg-secondary":"border-transparent hover:bg-secondary"}`}>
+              className={`w-full flex items-center justify-between py-3 px-4 border-l-2 transition-colors ${tab===t?"border-accent bg-secondary":"border-transparent hover:bg-secondary"}`}>
               <span className="capitalize flex items-center gap-3">
+                {t==="activity" && <Activity className="h-4 w-4" />}
                 {t==="orders" && <Package className="h-4 w-4" />}
                 {t==="addresses" && <MapPin className="h-4 w-4" />}
                 {t==="wishlist" && <Heart className="h-4 w-4" />}
@@ -67,7 +86,8 @@ function AccountPage() {
           </button>
         </nav>
 
-        <section>
+        <section className="animate-fade-up">
+          {tab === "activity" && <ActivityTab data={activity.data} loading={activity.isLoading} />}
           {tab === "orders" && <OrdersTab data={orders.data} loading={orders.isLoading} />}
           {tab === "addresses" && <AddressesTab data={addresses.data} refetch={addresses.refetch} />}
           {tab === "wishlist" && <WishlistTab data={wishlist.data} />}
@@ -75,6 +95,53 @@ function AccountPage() {
         </section>
       </div>
     </main>
+  );
+}
+
+function ActivityTab({ data, loading }: { data?: ActivityEvent[]; loading: boolean }) {
+  if (loading) return <div className="text-sm text-muted-foreground">Loading your activity…</div>;
+  if (!data?.length) return <Empty title="No activity yet" sub="Place an order, save a wishlist piece, or add an address — it'll all appear here." />;
+  const icon = (k: ActivityEvent["kind"]) => {
+    const cls = "h-4 w-4";
+    switch (k) {
+      case "order": return <ShoppingBag className={cls} />;
+      case "payment": return <CreditCard className={cls} />;
+      case "wishlist": return <Heart className={cls} />;
+      case "address": return <MapPin className={cls} />;
+      case "review": return <Star className={cls} />;
+      case "return": return <RotateCcw className={cls} />;
+      case "signin": return <LogIn className={cls} />;
+      case "account": return <UserPlus className={cls} />;
+    }
+  };
+  return (
+    <ol className="relative border-l hairline ml-3">
+      {data.map((e, i) => (
+        <li key={e.id} className="ml-6 pb-8 animate-fade-up" style={{ animationDelay: `${Math.min(i, 12) * 40}ms` }}>
+          <span className="absolute -left-[9px] mt-1 h-4 w-4 rounded-full bg-background border border-accent grid place-items-center text-accent">
+            {icon(e.kind)}
+          </span>
+          <div className="border hairline p-5 hover:border-foreground transition-colors">
+            <div className="flex items-baseline justify-between gap-4">
+              <div className="text-sm font-medium">
+                {e.link ? (
+                  <Link to={e.link.to as any} params={e.link.params as any} className="link-underline">{e.title}</Link>
+                ) : e.title}
+              </div>
+              <div className="text-[11px] uppercase tracking-widest text-muted-foreground whitespace-nowrap">
+                {new Date(e.at).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
+              </div>
+            </div>
+            {(e.detail || e.amount) && (
+              <div className="text-xs text-muted-foreground mt-2 flex gap-3">
+                {e.detail && <span>{e.detail}</span>}
+                {e.amount != null && <span className="text-foreground">{formatINR(e.amount)}</span>}
+              </div>
+            )}
+          </div>
+        </li>
+      ))}
+    </ol>
   );
 }
 

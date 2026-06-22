@@ -1,11 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import hero from "@/assets/hero.jpg";
 import catWomen from "@/assets/cat-women.jpg";
 import catMen from "@/assets/cat-men.jpg";
 import catAccessories from "@/assets/cat-accessories.jpg";
 import { PRODUCTS } from "@/lib/products";
 import { ProductCard } from "@/components/site/ProductCard";
+import { listPublicProducts } from "@/lib/api/catalog.functions";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -27,8 +30,17 @@ const CATEGORIES = [
 ] as const;
 
 function Index() {
-  const newArrivals = PRODUCTS.filter((p) => p.isNew);
-  const bestSellers = PRODUCTS.filter((p) => p.bestSeller);
+  const fetchProducts = useServerFn(listPublicProducts);
+  const { data: dbProducts } = useQuery({ queryKey: ["public-products"], queryFn: () => fetchProducts(), staleTime: 30_000 });
+  const merged = (() => {
+    const seen = new Set<string>();
+    const out: any[] = [];
+    for (const p of (dbProducts ?? [])) { if (!seen.has(p.slug)) { seen.add(p.slug); out.push(p); } }
+    for (const p of PRODUCTS) { if (!seen.has(p.slug)) { seen.add(p.slug); out.push(p); } }
+    return out;
+  })();
+  const newArrivals = merged.filter((p) => p.isNew).slice(0, 8);
+  const bestSellers = merged.filter((p) => p.bestSeller).slice(0, 8);
 
   return (
     <main>

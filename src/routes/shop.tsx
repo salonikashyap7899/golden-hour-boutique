@@ -1,8 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { ChevronDown, X } from "lucide-react";
 import { PRODUCTS, type Category } from "@/lib/products";
 import { ProductCard } from "@/components/site/ProductCard";
+import { listPublicProducts } from "@/lib/api/catalog.functions";
 
 type Search = { category?: Category | "all"; sort?: "newest" | "price-asc" | "price-desc" | "popular" };
 
@@ -33,9 +36,15 @@ function Shop() {
   const { category = "all", sort = "newest" } = Route.useSearch();
   const navigate = Route.useNavigate();
   const [priceMax, setPriceMax] = useState(100000);
+  const fetchProducts = useServerFn(listPublicProducts);
+  const { data: dbProducts } = useQuery({ queryKey: ["public-products"], queryFn: () => fetchProducts(), staleTime: 30_000 });
 
   const items = useMemo(() => {
-    let list = category === "all" || !category ? PRODUCTS : PRODUCTS.filter((p) => p.category === category);
+    const seen = new Set<string>();
+    const all: any[] = [];
+    for (const p of (dbProducts ?? [])) { if (!seen.has(p.slug)) { seen.add(p.slug); all.push(p); } }
+    for (const p of PRODUCTS) { if (!seen.has(p.slug)) { seen.add(p.slug); all.push(p); } }
+    let list = category === "all" || !category ? all : all.filter((p) => p.category === category);
     list = list.filter((p) => p.price <= priceMax);
     switch (sort) {
       case "price-asc": list = [...list].sort((a, b) => a.price - b.price); break;
@@ -44,7 +53,7 @@ function Shop() {
       default: list = [...list].sort((a, b) => Number(!!b.isNew) - Number(!!a.isNew));
     }
     return list;
-  }, [category, sort, priceMax]);
+  }, [category, sort, priceMax, dbProducts]);
 
   return (
     <main className="mx-auto max-w-[1400px] px-6 lg:px-10 pt-12 pb-24">
