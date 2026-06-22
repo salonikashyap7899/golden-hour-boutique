@@ -175,9 +175,9 @@ export const upsertSellerProduct = createServerFn({ method: "POST" })
     }
 
     const slug = slugify(data.title) + "-" + Math.floor(Math.random() * 9000 + 1000);
+    const sb: any = context.supabase;
 
     if (data.id) {
-      const sb: any = context.supabase;
       const { data: row, error } = await sb
         .from("products")
         .update({
@@ -185,8 +185,8 @@ export const upsertSellerProduct = createServerFn({ method: "POST" })
           description: data.description ?? null,
           price: data.price,
           compare_at_price: data.compare_at_price ?? null,
-          stock: data.stock,
           category_id,
+          is_active: true,
         })
         .eq("id", data.id)
         .eq("seller_id", seller.id)
@@ -194,11 +194,10 @@ export const upsertSellerProduct = createServerFn({ method: "POST" })
         .single();
       if (error) throw new Error(error.message);
       await sb.from("product_images").delete().eq("product_id", data.id);
-      await sb.from("product_images").insert({ product_id: data.id, url: data.image_url, position: 0 });
+      await sb.from("product_images").insert({ product_id: data.id, url: data.image_url, sort_order: 0 });
       return row;
     }
 
-    const sb: any = context.supabase;
     const { data: row, error } = await sb
       .from("products")
       .insert({
@@ -208,14 +207,13 @@ export const upsertSellerProduct = createServerFn({ method: "POST" })
         description: data.description ?? null,
         price: data.price,
         compare_at_price: data.compare_at_price ?? null,
-        stock: data.stock,
         category_id,
-        is_published: true,
+        is_active: true,
       })
       .select()
       .single();
     if (error) throw new Error(error.message);
-    await sb.from("product_images").insert({ product_id: row.id, url: data.image_url, position: 0 });
+    await sb.from("product_images").insert({ product_id: row.id, url: data.image_url, sort_order: 0 });
     return row;
   });
 
