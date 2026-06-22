@@ -11,10 +11,13 @@ import { toggleWishlist, isInWishlist } from "@/lib/api/wishlist.functions";
 import { listReviewsForSlug, submitReview } from "@/lib/api/reviews.functions";
 
 export const Route = createFileRoute("/product/$slug")({
-  loader: ({ params }) => {
-    const product = findProduct(params.slug);
-    if (!product) throw notFound();
-    return { product };
+  loader: async ({ params }) => {
+    const local = findProduct(params.slug);
+    if (local) return { product: local };
+    const { getPublicProductBySlug } = await import("@/lib/api/catalog.functions");
+    const remote = await getPublicProductBySlug({ data: { slug: params.slug } });
+    if (!remote) throw notFound();
+    return { product: remote as unknown as Product };
   },
   head: ({ loaderData }) => {
     const p = loaderData?.product;
@@ -43,6 +46,13 @@ export const Route = createFileRoute("/product/$slug")({
     <div className="mx-auto max-w-md text-center py-32 px-6">
       <h1 className="text-display text-4xl">Piece not found</h1>
       <p className="mt-3 text-sm text-muted-foreground">This piece has been retired from the collection.</p>
+      <Link to="/shop" className="btn-outline-dark mt-8">Back to shop</Link>
+    </div>
+  ),
+  errorComponent: ({ error }) => (
+    <div className="mx-auto max-w-md text-center py-32 px-6">
+      <h1 className="text-display text-3xl">Couldn't load this piece</h1>
+      <p className="mt-3 text-sm text-muted-foreground">{error.message}</p>
       <Link to="/shop" className="btn-outline-dark mt-8">Back to shop</Link>
     </div>
   ),
