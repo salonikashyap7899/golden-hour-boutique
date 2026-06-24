@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ArrowDown } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import hero from "@/assets/hero.jpg";
@@ -25,9 +25,9 @@ export const Route = createFileRoute("/")({
 });
 
 const CATEGORIES = [
-  { label: "Women",      to: "women",      img: catWomen,      kicker: "The Atelier collection" },
-  { label: "Men",        to: "men",        img: catMen,        kicker: "Tailoring & outerwear"  },
-  { label: "Accessories",to: "accessories",img: catAccessories,kicker: "Leather, silk, gold"    },
+  { label: "Women",       to: "women",       img: catWomen,       kicker: "The Atelier collection" },
+  { label: "Men",         to: "men",         img: catMen,         kicker: "Tailoring & outerwear"  },
+  { label: "Accessories", to: "accessories", img: catAccessories, kicker: "Leather, silk, gold"    },
 ] as const;
 
 const MARQUEE_WORDS = [
@@ -54,59 +54,184 @@ function Index() {
 
   return (
     <main>
-      {/* ── HERO ── */}
-      <section className="relative h-[92vh] min-h-[680px] w-full overflow-hidden bg-midnight">
-        {/* Parallax bg image */}
-        <img
-          src={hero}
-          alt="Aurelia silk gown — Maison atelier campaign"
-          width={1920}
-          height={1280}
-          className="gsap-parallax-bg absolute inset-0 h-[115%] w-full object-cover object-[70%_center]"
-          style={{ willChange: "transform", top: "-7.5%" }}
-        />
 
-        {/* Dark gradient overlay */}
-        <div className="absolute inset-0" style={{ background: "linear-gradient(105deg, oklch(0.095 0.004 55 / 0.88) 0%, oklch(0.095 0.004 55 / 0.45) 55%, transparent 100%)" }} />
-        <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, transparent 55%, oklch(0.095 0.004 55 / 0.65))" }} />
+      {/* ════════════════════════════════════════
+          HERO — Editorial Split Screen
+          ════════════════════════════════════════ */}
+      <section className="relative bg-midnight overflow-hidden" style={{ minHeight: "100svh" }}>
 
-        {/* Gold orbs */}
-        <div className="gold-orb w-[400px] h-[400px] opacity-[0.06]" style={{ top: "10%", right: "5%", "--dur": "7s", "--delay": "0s" } as any} />
-        <div className="gold-orb w-[280px] h-[280px] opacity-[0.04]" style={{ bottom: "15%", right: "25%", "--dur": "9s", "--delay": "-3s" } as any} />
+        {/* Ghost collection number — background watermark */}
+        <div
+          className="hero-ghost-num pointer-events-none select-none absolute left-[-2%] bottom-[-8%]"
+          aria-hidden="true"
+          style={{
+            fontFamily: "var(--font-serif)",
+            fontSize: "clamp(18rem, 38vw, 56rem)",
+            fontWeight: 700,
+            lineHeight: 0.85,
+            letterSpacing: "-0.06em",
+            color: "transparent",
+            WebkitTextStroke: "1px oklch(1 0 0 / 0.045)",
+            opacity: 0,
+            willChange: "opacity",
+          }}
+        >
+          26
+        </div>
 
-        {/* Hero content */}
-        <div className="absolute inset-0 flex items-center">
-          <div className="mx-auto max-w-[1400px] w-full px-6 lg:px-10">
-            <div className="max-w-2xl" style={{ willChange: "transform" }}>
-              <div className="hero-eyebrow text-eyebrow text-accent mb-6 flex items-center gap-4">
-                <span className="block w-10 h-px bg-accent" />
-                Atelier · Autumn 26
-              </div>
-              <h1 className="hero-title text-display text-[clamp(3.5rem,7vw,7rem)] leading-[0.92] text-foreground mb-8">
-                Quiet,<br />
-                considered,<br />
-                <em className="not-italic text-gold-shimmer">eternal.</em>
+        {/* Top meta bar */}
+        <div className="hero-meta absolute top-8 inset-x-0 px-7 lg:px-14 flex items-center justify-between z-10"
+          style={{ opacity: 0 }}>
+          <div className="text-eyebrow text-foreground/35 tracking-[0.35em]">Atelier · Autumn 2026</div>
+          <div className="text-eyebrow text-foreground/35 tracking-[0.35em] hidden md:block">No. 01 — 12</div>
+          <div className="text-eyebrow text-accent/70 tracking-[0.35em]">New collection</div>
+        </div>
+
+        {/* Main hero grid */}
+        <div className="relative z-10 grid lg:grid-cols-[1fr_1fr] min-h-screen items-stretch">
+
+          {/* ── LEFT: Typography ── */}
+          <div className="flex flex-col justify-end pb-14 px-7 lg:px-14 pt-36 lg:pt-0 order-2 lg:order-1">
+
+            {/* Eyebrow with rule */}
+            <div className="hero-eyebrow flex items-center gap-5 mb-9" style={{ opacity: 0 }}>
+              <div className="h-px w-12 bg-accent flex-shrink-0" />
+              <div className="text-eyebrow text-accent tracking-[0.32em]">The Maison Collection</div>
+            </div>
+
+            {/* Main headline */}
+            <div className="overflow-hidden mb-1">
+              <h1
+                className="hero-line-1 text-display leading-[0.9]"
+                style={{
+                  fontSize: "clamp(3.8rem, 8vw, 8.5rem)",
+                  opacity: 0,
+                  transform: "translateY(110%)",
+                  willChange: "transform, opacity",
+                }}
+              >
+                Quiet,
               </h1>
-              <p className="hero-subtitle text-[15px] leading-[1.9] text-foreground/60 max-w-sm mb-10">
-                Hand-finished silks, Italian wool and 18K gold — the new Atelier collection, made in limited runs.
-              </p>
-              <div className="hero-ctas flex flex-wrap gap-4">
-                <Link to="/shop" className="btn-gold magnetic" data-strength="0.25">
-                  Shop the collection <ArrowRight className="h-4 w-4" />
-                </Link>
-                <Link to="/shop" search={{ category: "women" }} className="btn-ghost-dark magnetic" data-strength="0.25">
-                  Women
-                </Link>
+            </div>
+            <div className="overflow-hidden mb-1">
+              <h1
+                className="hero-line-2 text-display leading-[0.9]"
+                style={{
+                  fontSize: "clamp(3.8rem, 8vw, 8.5rem)",
+                  opacity: 0,
+                  transform: "translateY(110%)",
+                  willChange: "transform, opacity",
+                }}
+              >
+                considered,
+              </h1>
+            </div>
+            <div className="overflow-hidden mb-10">
+              <h1
+                className="hero-line-3 text-display leading-[0.9] text-gold-shimmer"
+                style={{
+                  fontSize: "clamp(3.8rem, 8vw, 8.5rem)",
+                  opacity: 0,
+                  transform: "translateY(110%)",
+                  willChange: "transform, opacity",
+                }}
+              >
+                eternal.
+              </h1>
+            </div>
+
+            {/* Sub copy */}
+            <p
+              className="hero-sub text-[14px] leading-[1.95] text-foreground/45 max-w-sm mb-11"
+              style={{ opacity: 0, transform: "translateY(20px)" }}
+            >
+              Hand-finished silks, Italian wool and 18K gold —<br />
+              made in limited runs, from our Mumbai atelier.
+            </p>
+
+            {/* CTAs */}
+            <div className="hero-ctas flex flex-wrap items-center gap-5" style={{ opacity: 0 }}>
+              <Link
+                to="/shop"
+                className="btn-gold magnetic group"
+                data-strength="0.28"
+              >
+                Shop collection
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+              <Link
+                to="/shop"
+                search={{ category: "women" }}
+                className="link-underline text-eyebrow text-foreground/45 hover:text-accent"
+              >
+                Women
+              </Link>
+              <Link
+                to="/shop"
+                search={{ category: "men" }}
+                className="link-underline text-eyebrow text-foreground/45 hover:text-accent"
+              >
+                Men
+              </Link>
+            </div>
+
+            {/* Scroll cue */}
+            <div
+              className="hero-scroll mt-16 hidden lg:flex items-center gap-4"
+              style={{ opacity: 0 }}
+            >
+              <ArrowDown className="h-4 w-4 text-accent animate-bounce" />
+              <div className="text-eyebrow text-foreground/25 tracking-[0.3em]">Scroll to explore</div>
+            </div>
+          </div>
+
+          {/* ── RIGHT: Image ── */}
+          <div
+            className="hero-img-wrap relative order-1 lg:order-2 h-[56vw] lg:h-auto overflow-hidden"
+            style={{ clipPath: "inset(100% 0 0 0)", willChange: "clip-path" }}
+          >
+            <img
+              src={hero}
+              alt="Aurelia silk gown — Maison atelier campaign"
+              className="h-full w-full object-cover object-[62%_top] scale-[1.08]"
+              style={{ willChange: "transform" }}
+            />
+            {/* Edge vignettes */}
+            <div
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                background: "linear-gradient(180deg, oklch(0.095 0.004 55 / 0.22) 0%, transparent 25%, transparent 65%, oklch(0.095 0.004 55 / 0.55) 100%)",
+              }}
+            />
+            <div
+              className="absolute inset-0 pointer-events-none hidden lg:block"
+              style={{
+                background: "linear-gradient(270deg, transparent 60%, oklch(0.095 0.004 55 / 0.35) 100%)",
+              }}
+            />
+
+            {/* Floating badge */}
+            <div
+              className="hero-badge absolute bottom-10 left-8 lg:left-10 z-10"
+              style={{ opacity: 0 }}
+            >
+              <div
+                className="px-6 py-4 border border-white/15 backdrop-blur-md"
+                style={{ background: "oklch(0.095 0.004 55 / 0.72)" }}
+              >
+                <div className="text-eyebrow text-accent/80 mb-1">Featured</div>
+                <div className="text-sm text-foreground font-serif">Aurelia Silk Gown</div>
+                <div className="text-eyebrow text-foreground/35 mt-1">₹14,500</div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Scroll indicator */}
-        <div className="scroll-indicator">
-          <div className="scroll-indicator-line" />
-          <span className="scroll-indicator-label">Scroll</span>
-        </div>
+        {/* Bottom accent strip */}
+        <div
+          className="hero-strip absolute bottom-0 inset-x-0 h-px z-10"
+          style={{ background: "linear-gradient(90deg, transparent, var(--gold), transparent)", opacity: 0 }}
+        />
       </section>
 
       {/* ── MARQUEE ── */}
@@ -148,15 +273,16 @@ function Index() {
       <section className="mx-auto max-w-[1400px] px-6 lg:px-10 mt-28 md:mt-36">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-10 py-14 border-y border-white/[0.07]">
           {([
-            ["28", "Years of craft"],
-            ["100", "% handfinished"],
-            ["4999", "Free shipping above ₹"],
-            ["30", "Day returns"],
-          ] as const).map(([num, label]) => (
+            ["28", "+", "Years of craft"],
+            ["100", "%", "Handfinished"],
+            ["4999", "₹", "Free shipping above"],
+            ["30", "", "Day returns"],
+          ] as const).map(([num, suffix, label]) => (
             <div key={label} className="text-center md:text-left">
               <div className="stat-number">
+                {suffix === "₹" && <span className="text-[0.55em] mr-0.5 align-middle">₹</span>}
                 <span className="gsap-counter" data-target={num}>0</span>
-                {label.startsWith("Free") ? "" : label.includes("%") ? "%" : "+"}
+                {suffix !== "₹" && suffix}
               </div>
               <div className="text-eyebrow text-foreground/40 mt-3">{label}</div>
             </div>
@@ -239,7 +365,7 @@ function Index() {
       </section>
 
       {/* ── TRUST STRIP ── */}
-      <section className="mx-auto max-w-[1400px] px-6 lg:px-10 mt-0">
+      <section className="mx-auto max-w-[1400px] px-6 lg:px-10">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 py-14 border-b border-white/[0.07]">
           {([
             ["Free shipping",   "On orders above ₹4,999"],

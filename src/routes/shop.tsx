@@ -6,6 +6,7 @@ import { ChevronDown, X } from "lucide-react";
 import { PRODUCTS, type Category } from "@/lib/products";
 import { ProductCard } from "@/components/site/ProductCard";
 import { listPublicProducts } from "@/lib/api/catalog.functions";
+import { usePageAnimations } from "@/hooks/use-page-animations";
 
 type Search = { category?: Category | "all"; sort?: "newest" | "price-asc" | "price-desc" | "popular" };
 
@@ -47,34 +48,86 @@ function Shop() {
     let list = category === "all" || !category ? all : all.filter((p) => p.category === category);
     list = list.filter((p) => p.price <= priceMax);
     switch (sort) {
-      case "price-asc": list = [...list].sort((a, b) => a.price - b.price); break;
+      case "price-asc":  list = [...list].sort((a, b) => a.price - b.price); break;
       case "price-desc": list = [...list].sort((a, b) => b.price - a.price); break;
-      case "popular": list = [...list].sort((a, b) => b.reviews - a.reviews); break;
-      default: list = [...list].sort((a, b) => Number(!!b.isNew) - Number(!!a.isNew));
+      case "popular":    list = [...list].sort((a, b) => b.reviews - a.reviews); break;
+      default:           list = [...list].sort((a, b) => Number(!!b.isNew) - Number(!!a.isNew));
     }
     return list;
   }, [category, sort, priceMax, dbProducts]);
 
+  usePageAnimations();
+
   return (
     <main className="mx-auto max-w-[1400px] px-6 lg:px-10 pt-12 pb-24">
-      {/* Header */}
-      <div className="border-b hairline pb-10 mb-10">
-        <nav className="text-eyebrow text-muted-foreground"><Link to="/" className="link-underline">Home</Link> · Shop</nav>
-        <h1 className="text-display text-5xl md:text-6xl mt-4">{CAT_LABEL[category]}</h1>
-        <p className="text-sm text-muted-foreground mt-3">{items.length} {items.length === 1 ? "piece" : "pieces"}</p>
+
+      {/* ── Shop header ── */}
+      <div className="shop-header border-b border-white/[0.08] pb-10 mb-10">
+        <nav className="text-eyebrow text-muted-foreground">
+          <Link to="/" className="link-underline hover:text-accent transition-colors">Home</Link>
+          <span className="mx-2 text-foreground/20">·</span>
+          Shop
+        </nav>
+        <div className="mt-5 flex items-end justify-between">
+          <div>
+            <h1 className="text-display text-5xl md:text-6xl">{CAT_LABEL[category] ?? "All"}</h1>
+            <p className="text-eyebrow text-muted-foreground mt-3">
+              {items.length} {items.length === 1 ? "piece" : "pieces"}
+            </p>
+          </div>
+          <div className="hidden md:flex gap-3">
+            {(["all", "women", "men", "accessories"] as const).map((c) => (
+              <button
+                key={c}
+                onClick={() => navigate({ search: (p: Search) => ({ ...p, category: c }) })}
+                className={`text-eyebrow px-5 py-2.5 border transition-all duration-300 ${
+                  (category ?? "all") === c
+                    ? "border-accent text-accent bg-accent/[0.06]"
+                    : "border-white/10 text-foreground/40 hover:border-white/25 hover:text-foreground/65"
+                }`}
+              >
+                {CAT_LABEL[c]}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
-      <div className="grid lg:grid-cols-[260px_1fr] gap-12">
-        {/* Filters */}
-        <aside className="space-y-10 lg:sticky lg:top-28 lg:self-start">
-          <div>
-            <div className="text-eyebrow mb-4">Category</div>
-            <ul className="space-y-2 text-sm">
+      <div className="grid lg:grid-cols-[230px_1fr] gap-10">
+
+        {/* ── Filters Sidebar ── */}
+        <aside className="shop-sidebar space-y-10 lg:sticky lg:top-28 lg:self-start">
+          {/* Mobile category */}
+          <div className="lg:hidden">
+            <div className="text-eyebrow text-foreground/40 mb-4">Category</div>
+            <div className="flex flex-wrap gap-2">
               {(["all", "women", "men", "accessories"] as const).map((c) => (
-                <li key={c}>
+                <button
+                  key={c}
+                  onClick={() => navigate({ search: (p: Search) => ({ ...p, category: c }) })}
+                  className={`text-eyebrow px-4 py-2 border transition-all duration-300 ${
+                    (category ?? "all") === c
+                      ? "border-accent text-accent"
+                      : "border-white/10 text-foreground/40"
+                  }`}
+                >
+                  {CAT_LABEL[c]}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Desktop category list */}
+          <div className="hidden lg:block">
+            <div className="text-eyebrow text-foreground/35 mb-5">Category</div>
+            <ul className="gsap-stagger-list space-y-3 text-sm">
+              {(["all", "women", "men", "accessories"] as const).map((c) => (
+                <li key={c} className="gsap-list-item">
                   <button
                     onClick={() => navigate({ search: (p: Search) => ({ ...p, category: c }) })}
-                    className={`link-underline ${category === c ? "text-foreground font-medium" : "text-muted-foreground"}`}
+                    className={`link-underline transition-colors duration-300 ${
+                      (category ?? "all") === c ? "text-foreground font-medium" : "text-muted-foreground hover:text-accent"
+                    }`}
                   >
                     {CAT_LABEL[c]}
                   </button>
@@ -82,46 +135,56 @@ function Shop() {
               ))}
             </ul>
           </div>
+
+          {/* Price range */}
           <div>
-            <div className="text-eyebrow mb-4">Price · up to ₹{priceMax.toLocaleString("en-IN")}</div>
+            <div className="text-eyebrow text-foreground/35 mb-5">
+              Price · up to ₹{priceMax.toLocaleString("en-IN")}
+            </div>
             <input
               type="range" min={10000} max={100000} step={1000}
               value={priceMax}
               onChange={(e) => setPriceMax(Number(e.target.value))}
               className="w-full accent-[color:var(--gold)]"
             />
-          </div>
-          <div>
-            <div className="text-eyebrow mb-4">Active filters</div>
-            <div className="flex flex-wrap gap-2">
-              {category !== "all" && (
-                <button
-                  onClick={() => navigate({ search: (p: Search) => ({ ...p, category: "all" as const }) })}
-                  className="inline-flex items-center gap-1.5 text-[11px] tracking-[0.18em] uppercase border hairline px-3 py-1.5"
-                >
-                  {CAT_LABEL[category]} <X className="h-3 w-3" />
-                </button>
-              )}
+            <div className="flex justify-between text-[10px] text-foreground/25 mt-1.5 tracking-wider">
+              <span>₹10,000</span>
+              <span>₹1,00,000</span>
             </div>
           </div>
+
+          {/* Active filters */}
+          {category && category !== "all" && (
+            <div>
+              <div className="text-eyebrow text-foreground/35 mb-4">Active</div>
+              <button
+                onClick={() => navigate({ search: (p: Search) => ({ ...p, category: "all" as const }) })}
+                className="inline-flex items-center gap-2 text-[11px] tracking-[0.18em] uppercase border border-white/10 px-3 py-2 hover:border-accent hover:text-accent transition-all duration-300"
+              >
+                {CAT_LABEL[category]} <X className="h-3 w-3" />
+              </button>
+            </div>
+          )}
         </aside>
 
-        {/* Grid */}
+        {/* ── Product Grid ── */}
         <div>
           <div className="flex items-center justify-between mb-8">
-            <div className="text-sm text-muted-foreground">Sort</div>
+            <div className="text-eyebrow text-foreground/30">
+              Sorted by
+            </div>
             <div className="relative">
               <select
                 value={sort}
                 onChange={(e) => navigate({ search: (p: Search) => ({ ...p, sort: e.target.value as Search["sort"] }) })}
-                className="appearance-none bg-transparent border hairline pl-4 pr-10 py-2 text-eyebrow cursor-pointer focus:outline-none focus:border-accent"
+                className="appearance-none bg-transparent border border-white/10 pl-4 pr-10 py-2.5 text-eyebrow text-foreground/60 cursor-pointer focus:outline-none focus:border-accent transition-colors hover:border-white/25"
               >
                 <option value="newest">Newest</option>
                 <option value="popular">Popular</option>
                 <option value="price-asc">Price · low to high</option>
                 <option value="price-desc">Price · high to low</option>
               </select>
-              <ChevronDown className="h-4 w-4 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <ChevronDown className="h-3.5 w-3.5 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-foreground/40" />
             </div>
           </div>
 
@@ -131,8 +194,10 @@ function Shop() {
               <p className="mt-3 text-sm text-muted-foreground">Try widening your filters.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-12 md:gap-x-6">
-              {items.map((p) => <ProductCard key={p.id} product={p} />)}
+            <div className="shop-product-grid grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-12 md:gap-x-5">
+              {items.map((p) => (
+                <ProductCard key={p.id} product={p} />
+              ))}
             </div>
           )}
         </div>
