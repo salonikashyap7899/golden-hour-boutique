@@ -15,6 +15,7 @@ import { CartProvider } from "@/lib/cart";
 import { AuthProvider } from "@/lib/auth";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
+import { LenisProvider } from "@/components/site/LenisProvider";
 
 function NotFoundComponent() {
   return (
@@ -85,9 +86,11 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <CartProvider>
-          <Header />
-          <Outlet />
-          <Footer />
+          <LenisProvider>
+            <Header />
+            <Outlet />
+            <Footer />
+          </LenisProvider>
         </CartProvider>
       </AuthProvider>
     </QueryClientProvider>
