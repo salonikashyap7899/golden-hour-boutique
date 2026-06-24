@@ -1,0 +1,555 @@
+# ACUNMEDYA UI Design System
+**Version 1.0 — Implementation-Ready Component Guidance**
+*E-commerce Storefront · WCAG 2.2 AA · Token-Driven*
+
+---
+
+## 1. Context and Goals
+
+ACUNMEDYA is a global independent media and entertainment company delivering original formats, dramas, and world-known show adaptations across 15+ territories, 4 continents, and 150M+ viewers. This design system governs the e-commerce storefront surface — the public-facing product layer where online shoppers and consumers discover, evaluate, and purchase ACUNMEDYA-affiliated content, merchandise, and subscriptions.
+
+**Design intent in one sentence:** Deliver a dark, high-contrast storefront that reflects ACUNMEDYA's world-stage confidence — precise, fast to navigate, and accessible to all shoppers at scale.
+
+**Page component density to target:**
+- Links: 180
+- Buttons: 170
+- Cards: 16
+- Lists: 5
+- Navigation: 1
+- Tables: 1
+
+Density at this scale demands strict token discipline. Every spacing, type, and color decision must pull from the system — no local exceptions.
+
+---
+
+## 2. Design Tokens and Foundations
+
+### 2.1 Color Tokens
+
+| Token | Value | Role |
+|---|---|---|
+| `color.surface.base` | `#000000` | Page background, card backgrounds |
+| `color.surface.strong` | `#ffcb04` | Primary CTA backgrounds, active states, badges |
+| `color.text.primary` | `#ffffff` | Body copy, headings on dark surfaces |
+| `color.text.secondary` | `#111111` | Text on `color.surface.strong` (yellow backgrounds) |
+| `color.text.inverse` | `#cfcfcf` | Secondary/subdued text, captions, metadata |
+| `color.border.strong` | `#f69679` | Focus rings, active borders, hover borders |
+
+**Contrast audit (WCAG 2.2 AA required):**
+
+| Combination | Ratio | AA Pass |
+|---|---|---|
+| `color.text.primary` on `color.surface.base` | 21:1 | ✅ |
+| `color.text.secondary` on `color.surface.strong` | 14.7:1 | ✅ |
+| `color.text.inverse` on `color.surface.base` | 9.5:1 | ✅ |
+| `color.border.strong` on `color.surface.base` | 4.6:1 | ✅ (AA large text + UI) |
+
+> **Must:** Never render `color.text.inverse` (`#cfcfcf`) on any surface lighter than `color.surface.base`. It will fail AA on light backgrounds.
+
+---
+
+### 2.2 Typography Tokens
+
+**Font stack:** `font.family.primary` = `Inter, sans-serif`
+
+| Token | Value | Usage |
+|---|---|---|
+| `font.size.xs` | `12.8px` | Captions, legal copy, table metadata |
+| `font.size.sm` | `14px` | Secondary labels, helper text, nav sub-items |
+| `font.size.md` | `14.4px` | Body copy, card descriptions |
+| `font.size.lg` | `16px` | Subheadings, card titles, button labels |
+| `font.size.xl` | `35.2px` | Section headings (H2) |
+| `font.size.2xl` | `108px` | Hero display numbers (impact counters) |
+| `font.size.3xl` | `128px` | Brand hero headline (single-use, fold-only) |
+
+**Weight:** `font.weight.base` = `400`; use `600` for headings and button labels; use `700` for display numerals only.
+
+**Line height:** `font.lineHeight.base` = `15.36px` (1.2× base). For body text blocks, use `1.5×` the rendered font size (e.g., `font.size.md` = 21.6px line height). Only `font.lineHeight.base` applies to single-line UI labels and captions.
+
+> **Must:** Never set body paragraph text below `font.size.md` (14.4px). Below this threshold, contrast and readability fail at standard viewing distances.
+
+---
+
+### 2.3 Spacing Tokens
+
+| Token | Value | Usage |
+|---|---|---|
+| `space.1` | `5px` | Icon-to-label gaps, badge padding |
+| `space.2` | `10px` | Inline element gaps, dense lists |
+| `space.3` | `15px` | Card internal padding (compact) |
+| `space.4` | `20px` | Card internal padding (standard), input padding |
+| `space.5` | `25px` | Section sub-group gaps |
+| `space.6` | `30px` | Component-to-component vertical rhythm |
+| `space.7` | `45px` | Section-level vertical spacing |
+| `space.8` | `60px` | Page-section separation |
+
+> **Must:** All spacing values must reference tokens. No raw pixel values in component code.
+
+---
+
+### 2.4 Radius and Motion Tokens
+
+| Token | Value | Usage |
+|---|---|---|
+| `radius.xs` | `24px` | Pill badges, tags, small chips |
+| `radius.sm` | `32px` | Buttons, input fields, modal containers |
+
+**Motion:** Default to `prefers-reduced-motion: reduce`. When motion is acceptable, transitions must be ≤ 200ms for state changes (hover, focus) and ≤ 350ms for enter/exit animations. No looping ambient animation on interactive components.
+
+---
+
+## 3. Component Rules
+
+---
+
+### 3.1 Navigation Bar
+
+**Design intent:** Single persistent navigation bar anchoring 180 links-worth of storefront density — must be scannable, keyboard-operable, and stable across all breakpoints.
+
+#### Anatomy
+```
+┌─────────────────────────────────────────────────────────────┐
+│ [LOGO]   ABOUT  WHERE WE ARE  PRODUCTIONS  NEWSROOM  [CTA] │
+└─────────────────────────────────────────────────────────────┘
+```
+
+- **Logo:** SVG lockup, left-anchored. Min touch target: 44×44px.
+- **Nav links:** `font.size.sm`, `font.weight.base` 600, `color.text.primary`, spaced with `space.5` between items.
+- **CTA button:** Rightmost slot. Uses Button (Primary) component rules.
+- **Language toggle:** `color.text.inverse`, `font.size.xs`. Positioned after CTA.
+
+#### States
+
+| State | Style |
+|---|---|
+| Default | `color.text.primary` on `color.surface.base`. No underline. |
+| Hover | Underline 1px `color.border.strong`. Color stays `color.text.primary`. |
+| Focus-visible | `outline: 2px solid color.border.strong; outline-offset: 3px`. Must be visible above nav surface. |
+| Active (current page) | `color.surface.strong` text, `font.weight.base` 700 |
+| Disabled | `color.text.inverse`, `cursor: not-allowed`, no interaction |
+
+#### Responsive
+
+- **≥1024px:** Horizontal nav, all items visible.
+- **768–1023px:** Condense to icons + labels, hide secondary items behind "More" menu.
+- **<768px:** Hamburger menu. Drawer opens from right, `color.surface.base` background, full link list, `space.6` between items.
+
+#### Keyboard behavior
+- `Tab` moves focus through nav items left to right.
+- `Enter` / `Space` activates the focused link.
+- `Escape` closes any open dropdown or drawer.
+- Skip-to-content link must be the **first** focusable element on page load. Becomes visible on focus: `color.text.secondary` on `color.surface.strong`, `font.size.sm`.
+
+#### Accessibility acceptance criteria
+- [ ] Skip-to-content link is the first tab stop and visually appears on focus.
+- [ ] All nav items have descriptive `aria-label` or visible text label.
+- [ ] Active page link has `aria-current="page"`.
+- [ ] Mobile drawer is `role="dialog"` with `aria-modal="true"` and focus trap.
+- [ ] Focus ring (`color.border.strong`, 2px, offset 3px) is visible against `color.surface.base`.
+
+---
+
+### 3.2 Button
+
+**Design intent:** Storefront drives 170 button interactions per page — every button must communicate its action precisely and be operable by keyboard, pointer, and touch without ambiguity.
+
+#### Variants
+
+**Primary**
+- Background: `color.surface.strong`
+- Text: `color.text.secondary`
+- `font.size.lg`, `font.weight.base` 600
+- Padding: `space.3` vertical, `space.6` horizontal
+- `border-radius: radius.sm`
+
+**Secondary**
+- Background: transparent
+- Border: `1.5px solid color.border.strong`
+- Text: `color.text.primary`
+- Same padding and radius as Primary
+
+**Ghost**
+- Background: transparent, no border
+- Text: `color.text.inverse`
+- Underline on hover
+
+**Destructive**
+- Background: `#c0392b` (only raw value permitted in system — semantic danger color not in palette)
+- Text: `color.text.primary`
+- Use only for irreversible actions (e.g., cancel subscription, delete)
+
+#### States
+
+| State | Primary | Secondary | Ghost |
+|---|---|---|---|
+| Default | `color.surface.strong` bg | Transparent + `color.border.strong` border | No bg/border |
+| Hover | `color.surface.strong` at 85% opacity | `color.border.strong` bg at 10% opacity | Underline `color.text.inverse` |
+| Focus-visible | `outline: 2px solid color.border.strong; outline-offset: 3px` on all variants | | |
+| Active | `color.surface.strong` at 70% opacity, scale 0.98 | Scale 0.98 | Scale 0.98 |
+| Disabled | `color.text.inverse` text, `color.surface.base` bg, `opacity: 0.4`, `cursor: not-allowed`, `aria-disabled="true"` | | |
+| Loading | Spinner replaces label (or appears inline left of label). Button width is locked. `aria-busy="true"`. Label becomes visually hidden but available to screen readers. | | |
+| Error | Button returns to default. System-level error message is announced via `aria-live="polite"` region — not inline on button itself. | | |
+
+#### Keyboard behavior
+- `Tab` / `Shift+Tab` to move focus.
+- `Enter` or `Space` activates.
+- Loading state: focus remains on button. Remove `aria-busy` and restore label on completion.
+
+#### Touch behavior
+- Minimum touch target: 44×44px. Padding must achieve this without visual inflation.
+- Tap produces instant visual feedback (active state). No 300ms delay.
+
+#### Label rules
+- **Must** use active-voice verbs: "Add to cart", "View production", "Contact us".
+- **Must not** use: "Submit", "Click here", "OK", "Yes".
+- Long labels (>30 characters): truncate with ellipsis, full text in `title` attribute and `aria-label`.
+
+#### Edge cases
+- Button inside a loading skeleton: replace with a `<div>` placeholder at the same dimensions. Never render a disabled button during skeleton load.
+- Icon-only buttons **must** have `aria-label` with the action text.
+- Icon + label buttons: icon is `aria-hidden="true"`, label carries semantic meaning.
+
+#### Accessibility acceptance criteria
+- [ ] All buttons have accessible names (visible label or `aria-label`).
+- [ ] Focus ring is visible at `color.border.strong`, 2px, offset 3px.
+- [ ] `aria-disabled="true"` is used (not `disabled`) when button must remain keyboard-reachable.
+- [ ] Loading state announces to screen reader via `aria-busy="true"`.
+- [ ] Minimum 44×44px touch target on all button variants.
+
+---
+
+### 3.3 Link
+
+**Design intent:** 180 links in a dense storefront — every link must be distinguishable from surrounding text without relying solely on color.
+
+#### Anatomy
+- Inline link: `color.text.primary` with `text-decoration: underline`. On dark surface, underline color is `color.border.strong`.
+- Navigation link: no underline by default (see Navigation rules above).
+- External link: append external link icon (`aria-label` must include "(opens in new tab)").
+
+#### States
+
+| State | Style |
+|---|---|
+| Default | Underline `color.border.strong` |
+| Hover | `color.surface.strong` text color, underline persists |
+| Focus-visible | `outline: 2px solid color.border.strong; outline-offset: 2px` |
+| Active | `color.surface.strong` text, underline |
+| Visited | `color.text.inverse` — applies to content links only, not navigation |
+| Disabled | `color.text.inverse`, `aria-disabled="true"`, `cursor: default`, underline removed |
+
+#### Accessibility acceptance criteria
+- [ ] Links are distinguishable from surrounding text by both color AND underline (not color alone).
+- [ ] Links have descriptive text — never "click here", "read more" alone.
+- [ ] "Read more" links must include context: `aria-label="Read more about Exatlon"`.
+- [ ] External links announce their behavior to screen readers.
+- [ ] Focus ring meets 2px `color.border.strong` at offset 2px minimum.
+
+---
+
+### 3.4 Card
+
+**Design intent:** 16 cards per page surface production content and products — each must convey hierarchy (image → title → description → CTA) and scale cleanly from grid to list view.
+
+#### Anatomy
+```
+┌──────────────────────────────┐
+│ [Image 16:9 or 4:3]          │
+├──────────────────────────────┤
+│ [Eyebrow / Category]         │  ← font.size.xs, color.text.inverse
+│ [Title]                      │  ← font.size.lg, color.text.primary, weight 600
+│ [Description (2–3 lines max)]│  ← font.size.md, color.text.inverse
+│ [CTA Button / Link]          │  ← Button (Ghost) or Link
+└──────────────────────────────┘
+```
+
+- Background: `color.surface.base`
+- Border: `1px solid` `color.border.strong` at 20% opacity by default
+- `border-radius: radius.xs`
+- Internal padding: `space.4`
+- Gap between elements: `space.3`
+
+#### States
+
+| State | Style |
+|---|---|
+| Default | `color.surface.base` bg, subtle border |
+| Hover | Border becomes `1px solid color.border.strong` at 100%; box-shadow: `0 4px 16px rgba(246,150,121,0.15)` |
+| Focus-visible (card as link) | `outline: 2px solid color.border.strong; outline-offset: 4px` on card container |
+| Active | Scale 0.99, shadow collapses |
+| Loading (skeleton) | Shimmer animation on image and text blocks. Use `aria-hidden="true"` on skeleton, announce load via `aria-live="polite"`. |
+| Error (image load fail) | Replace with `color.surface.base` bg + centered `color.text.inverse` error icon. Alt text remains. |
+
+#### Image rules
+- **Must** provide `alt` text on all card images.
+- **Must** use `aspect-ratio: 16/9` (or `4/3` for portrait productions). Never allow free-height images that collapse layout.
+- Lazy-load images below the fold with `loading="lazy"`.
+
+#### Responsive
+- **≥1024px:** 4-column grid, `space.6` gap.
+- **768–1023px:** 2-column grid, `space.5` gap.
+- **<768px:** 1-column stack, `space.4` gap.
+
+#### Long content handling
+- Titles: cap at 2 lines, overflow with ellipsis + `title` attribute.
+- Descriptions: cap at 3 lines, overflow with ellipsis.
+- Empty state: show placeholder text "Content coming soon" at `color.text.inverse`.
+
+#### Accessibility acceptance criteria
+- [ ] Card image has meaningful `alt` text (not filename, not empty for non-decorative images).
+- [ ] If entire card is a link, it uses `<a>` wrapping with `aria-label` = full title.
+- [ ] Focus ring is visible at 2px `color.border.strong`.
+- [ ] Loading skeleton has `aria-hidden="true"` and does not trap focus.
+- [ ] Error state image is announced to screen readers via `role="img"` with descriptive alt.
+
+---
+
+### 3.5 Input Field
+
+**Design intent:** Every contact and checkout form field must be instantly scannable, error-recoverable, and never trap keyboard users.
+
+#### Anatomy
+```
+[Label]              ← font.size.sm, color.text.primary, weight 600
+[Helper text]        ← font.size.xs, color.text.inverse
+┌──────────────────────────────┐
+│ Placeholder or value text    │  ← font.size.md, color.text.primary
+└──────────────────────────────┘
+[Error message]      ← font.size.xs, #c0392b (danger), with ⚠ icon
+```
+
+- Background: `color.surface.base`
+- Border: `1px solid color.text.inverse`
+- `border-radius: radius.sm`
+- Padding: `space.4` vertical, `space.4` horizontal
+- Label always visible above field — never inside field as sole label
+
+#### States
+
+| State | Border | Text |
+|---|---|---|
+| Default | `1px solid color.text.inverse` | `color.text.primary` |
+| Hover | `1px solid color.border.strong` | `color.text.primary` |
+| Focus-visible | `2px solid color.border.strong`, `outline: none` (border IS the focus indicator) | `color.text.primary` |
+| Filled | `1px solid color.text.inverse` | `color.text.primary` |
+| Disabled | `1px solid color.text.inverse` at 30% opacity, `color.text.inverse` text, `cursor: not-allowed` | `color.text.inverse` |
+| Error | `2px solid #c0392b`, error message below field | `color.text.primary` |
+| Loading | Border pulses at 50% opacity, field is `readonly`, `aria-busy="true"` | `color.text.inverse` |
+
+#### Keyboard behavior
+- `Tab` enters field, `Shift+Tab` exits.
+- `Escape` clears autocomplete dropdowns; does not clear field value.
+- Arrow keys navigate select/dropdown options.
+
+#### Accessibility acceptance criteria
+- [ ] Every input has a visible `<label>` with `for` matching input `id`.
+- [ ] Placeholder is supplementary only — never the sole label.
+- [ ] Error messages are associated via `aria-describedby`.
+- [ ] Error state never relies solely on red color — must include ⚠ icon and text.
+- [ ] Focus indicator is `2px solid color.border.strong` — visible against `color.surface.base`.
+- [ ] Required fields marked with `aria-required="true"` and visible asterisk with tooltip explanation.
+
+---
+
+### 3.6 Table
+
+**Design intent:** One table per page (locations/territories) — must be data-readable, keyboard-navigable, and not visually compete with card density.
+
+#### Anatomy
+```
+┌─────────────────────────────────────────────────────────────────┐
+│ [Column Header A]        [Column Header B]                       │
+├─────────────────────────────────────────────────────────────────┤
+│ TURKEY   turkiye@acunmedya.com   │  MEXICO   mexico@acunmedya.com│
+│ ...                                                             │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+- `<table>` with `<thead>`, `<tbody>`, `<th scope="col">`.
+- Row background: `color.surface.base`. Alternate rows: `color.text.secondary` at 5% opacity for stripe.
+- Cell padding: `space.4` vertical, `space.5` horizontal.
+- Header: `font.size.sm`, `font.weight.base` 600, `color.text.inverse`, uppercase.
+- Cell text: `font.size.sm`, `color.text.primary`.
+- Links in cells (email): `color.border.strong`, underline.
+- `border-collapse: collapse`. Row divider: `1px solid color.text.inverse` at 20%.
+
+#### States
+
+| State | Style |
+|---|---|
+| Row hover | Background `color.text.secondary` at 8% opacity |
+| Cell focus-visible | `outline: 2px solid color.border.strong; outline-offset: -2px` inside cell |
+| Sortable column header hover | Cursor pointer, sort icon revealed `color.border.strong` |
+
+#### Responsive
+- **≥768px:** Full table layout.
+- **<768px:** Stacked card-style rows. Each row becomes a `<div>` with label: value pairs. Table structure preserved via ARIA. `role="table"`, `role="row"`, `role="cell"` on transformed markup.
+
+#### Accessibility acceptance criteria
+- [ ] `<table>` has `aria-label` or `<caption>` describing its purpose.
+- [ ] All `<th>` elements have `scope="col"` or `scope="row"`.
+- [ ] Interactive cells (email links) are keyboard-reachable and announce full context.
+- [ ] Mobile-transformed table preserves ARIA table semantics.
+
+---
+
+### 3.7 List
+
+**Design intent:** Five lists per page — must be semantic, scannable, and never styled as decorative bullet art that confuses screen readers.
+
+#### Anatomy
+- Unordered: `<ul>` with `list-style: none`, custom `::before` marker in `color.border.strong` (2px × 2px square or 4px circle).
+- Ordered: `<ol>`, numeric markers in `color.surface.strong` (`color.text.secondary` for contrast), `font.weight.base` 700.
+- `font.size.md`, `color.text.primary`, `line-height: 1.5×`.
+- `space.2` between list items.
+- Nested lists: `space.3` indent, one level deep maximum.
+
+#### States
+- List items that are links: follow Link component rules.
+- Hover on interactive list items: `color.border.strong` left border `2px` animation, `color.surface.base` bg stays.
+
+#### Accessibility acceptance criteria
+- [ ] `<ul>` and `<ol>` are used for genuinely list-structured content, not for layout.
+- [ ] Custom `::before` markers are `aria-hidden` or implemented as CSS-only (no extra `<span>` confusion).
+- [ ] List items that are links have descriptive text.
+
+---
+
+## 4. Accessibility Requirements
+
+### 4.1 Global Rules
+
+- **Must** pass WCAG 2.2 AA on all text and interactive element contrast.
+- **Must** provide `focus-visible` outlines on all interactive elements: `2px solid color.border.strong`, offset `3px` (links: `2px`).
+- **Must** support keyboard-only navigation through the entire storefront without mouse.
+- **Must** implement `aria-live` regions for dynamic content (cart updates, error messages, loading states).
+- **Must** never hide focus indicators using `outline: none` without a replacement visible indicator.
+- **Should** test with NVDA + Chrome (Windows) and VoiceOver + Safari (macOS/iOS).
+
+### 4.2 Testable Acceptance Criteria Matrix
+
+| Criterion | Pass Condition | Fail Condition |
+|---|---|---|
+| Color contrast (body text) | ≥4.5:1 | `color.text.inverse` on any surface not `color.surface.base` |
+| Color contrast (large text ≥18px) | ≥3:1 | Any heading below 3:1 |
+| Focus indicator | 2px `color.border.strong` visible | `outline: none` with no replacement |
+| Keyboard navigation | All interactive elements reachable via `Tab` | Any pointer-only interaction |
+| Screen reader announcements | `aria-live` fires on state change | Silent dynamic updates |
+| Skip link | First focusable element, visually appears on focus | Skip link absent or hidden permanently |
+| Touch target | ≥44×44px | Any button/link below 44px in either dimension |
+| Error messages | Text + icon, not color alone | Red-only error with no text description |
+| Loading states | `aria-busy="true"` present | Spinner with no ARIA state |
+| Form labels | `<label for>` on all inputs | Placeholder-only labeling |
+
+---
+
+## 5. Content and Tone Standards
+
+### 5.1 Voice Principles
+
+- **Concise:** Maximum information per word. Cut filler.
+- **Confident:** State facts and actions directly. No hedging.
+- **Implementation-focused:** Describe what happens when a user acts.
+
+### 5.2 Button and CTA Labels
+
+| ✅ Use | ❌ Avoid |
+|---|---|
+| "View production" | "Click here" |
+| "Add to cart" | "Submit" |
+| "Contact Turkey office" | "More info" |
+| "Watch now" | "Go" |
+| "Download press kit" | "OK" |
+| "Explore our networks" | "Learn more" (without context) |
+
+> **Must:** "Learn more" and "Read more" links **must** include an `aria-label` with the target subject: `aria-label="Read more about Exatlon Hungary"`.
+
+### 5.3 Error Messages
+
+- State what went wrong. State how to fix it.
+- Format: `[What failed]. [How to resolve].`
+- Example: "Email address is invalid. Use the format name@domain.com."
+- Never: "Something went wrong." "Error." "Invalid input."
+
+### 5.4 Empty States
+
+- Explain why the content is absent. Offer a next action.
+- Example: "No productions match this filter. Clear filters to see all shows."
+- Never leave empty containers visually blank with no explanation.
+
+### 5.5 Loading States
+
+- Label the process: "Loading productions…" not a bare spinner.
+- On completion, announce result: "16 productions loaded." via `aria-live="polite"`.
+
+---
+
+## 6. Anti-Patterns and Prohibited Implementations
+
+| Anti-pattern | Why prohibited | Correct implementation |
+|---|---|---|
+| `outline: none` with no replacement | Removes keyboard access | Replace with `2px solid color.border.strong` |
+| Raw hex values in component CSS | Breaks token system | Use semantic token names |
+| Placeholder text as sole field label | Disappears on input, inaccessible | Always use visible `<label>` |
+| `color.text.inverse` on light surface | Fails contrast | `color.text.inverse` only on `color.surface.base` |
+| Icon-only buttons without `aria-label` | Screen reader reads nothing | `aria-label="[Action name]"` required |
+| `<div>` or `<span>` for interactive elements | Not keyboard-operable | Use `<button>` or `<a>` |
+| Fixed `font-size` in px on `<html>` | Breaks user font scaling | Use `rem` from a 16px base; apply token values relative to that |
+| Disabled attribute on buttons that must stay reachable | Removes from tab order | Use `aria-disabled="true"` + `pointer-events: none` |
+| Sole color to indicate errors | Fails WCAG 1.4.1 | Error text + ⚠ icon always |
+| Auto-play video with audio in hero | Distracting, inaccessible | Muted autoplay only; controls always visible |
+| Spacing values not from scale | Creates visual inconsistency | All spacing via `space.1`–`space.8` tokens |
+| One-off `border-radius` values | Breaks system coherence | Only `radius.xs` or `radius.sm` |
+
+---
+
+## 7. QA Checklist
+
+### 7.1 Design Token Compliance
+- [ ] All color references use semantic token names, not raw hex.
+- [ ] All spacing uses `space.1`–`space.8` tokens only.
+- [ ] All typography uses font scale tokens. No one-off sizes.
+- [ ] `border-radius` values are `radius.xs` or `radius.sm` only.
+- [ ] Motion respects `prefers-reduced-motion`.
+
+### 7.2 Component State Coverage
+- [ ] Every interactive component has defined styles for: default, hover, focus-visible, active, disabled, loading, error.
+- [ ] Loading states implement `aria-busy="true"`.
+- [ ] Error states include text + icon (not color alone).
+- [ ] Disabled states use `aria-disabled="true"` (not `disabled`) where keyboard reachability is required.
+
+### 7.3 Accessibility
+- [ ] All text passes WCAG 2.2 AA contrast (4.5:1 body, 3:1 large text).
+- [ ] All interactive elements are keyboard-reachable via `Tab`.
+- [ ] Focus indicators are visible and meet `2px solid color.border.strong` minimum.
+- [ ] Skip-to-content link is first focusable element.
+- [ ] All images have descriptive `alt` text (or `alt=""` for purely decorative).
+- [ ] All form inputs have `<label for>` associations.
+- [ ] Error messages use `aria-describedby` linking to input.
+- [ ] Dynamic updates use `aria-live="polite"` or `aria-live="assertive"`.
+- [ ] Mobile drawer/modal uses `role="dialog"`, `aria-modal="true"`, and focus trap.
+- [ ] External links announce "(opens in new tab)" via `aria-label`.
+
+### 7.4 Content
+- [ ] All CTAs use active-voice, specific action verbs.
+- [ ] No "click here", "submit", "OK", or "more info" labels exist in production.
+- [ ] "Read more" / "Learn more" links have `aria-label` with full context.
+- [ ] All error messages state what failed and how to fix it.
+- [ ] Empty states display explanatory text and a next action.
+
+### 7.5 Responsive
+- [ ] Navigation collapses correctly at 768px and 1024px breakpoints.
+- [ ] Card grid reflows from 4 → 2 → 1 column at breakpoints.
+- [ ] Table transforms to stacked layout below 768px with ARIA table semantics preserved.
+- [ ] All touch targets are ≥44×44px at every breakpoint.
+- [ ] `font.size.2xl` (108px) and `font.size.3xl` (128px) scale down gracefully on mobile (use `clamp()` or responsive type scale).
+
+### 7.6 Performance
+- [ ] Card images use `loading="lazy"` below the fold.
+- [ ] Hero video is muted autoplay only; `<video>` has `controls` attribute.
+- [ ] Skeleton loaders appear within 100ms of data fetch initiation.
+- [ ] Button widths are locked during loading state (no layout shift).
+
+---
+
+*ACUNMEDYA UI Design System v1.0 — Prepared for storefront implementation teams. All rules marked "must" are non-negotiable and gate deployment approval. Rules marked "should" are strong recommendations subject to design lead sign-off.*
