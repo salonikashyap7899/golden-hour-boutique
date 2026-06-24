@@ -16,6 +16,8 @@ import { AuthProvider } from "@/lib/auth";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { LenisProvider } from "@/components/site/LenisProvider";
+import { PageTransition } from "@/components/site/PageTransition";
+import { CustomCursor } from "@/components/site/CustomCursor";
 
 function NotFoundComponent() {
   return (
@@ -23,10 +25,8 @@ function NotFoundComponent() {
       <div className="max-w-md text-center">
         <div className="text-eyebrow text-accent">404</div>
         <h1 className="mt-4 text-display text-5xl">Lost in the atelier</h1>
-        <p className="mt-4 text-sm text-muted-foreground">
-          This page doesn't exist or has been retired from the collection.
-        </p>
-        <Link to="/" className="btn-outline-dark mt-8">Return home</Link>
+        <p className="mt-4 text-sm text-muted-foreground">This page doesn't exist or has been retired from the collection.</p>
+        <Link to="/" className="btn-outline-dark mt-8 inline-flex">Return home</Link>
       </div>
     </div>
   );
@@ -87,6 +87,9 @@ function RootComponent() {
       <AuthProvider>
         <CartProvider>
           <LenisProvider>
+            <div className="noise-overlay" aria-hidden="true" />
+            <CustomCursor />
+            <PageTransition />
             <Header />
             <Outlet />
             <Footer />
