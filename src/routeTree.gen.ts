@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SmokeLenisRouteImport } from './routes/smoke-lenis'
 import { Route as ShopRouteImport } from './routes/shop'
 import { Route as SellRouteImport } from './routes/sell'
 import { Route as SearchRouteImport } from './routes/search'
@@ -18,7 +19,6 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
-import { Route as SmokeLenisRouteImport } from './routes/_smoke.lenis'
 import { Route as AuthenticatedSellerRouteImport } from './routes/_authenticated/seller'
 import { Route as AuthenticatedCheckoutRouteImport } from './routes/_authenticated/checkout'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
@@ -26,6 +26,11 @@ import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticate
 import { Route as ApiPublicRazorpayWebhookRouteImport } from './routes/api/public/razorpay-webhook'
 import { Route as AuthenticatedAccountOrdersIdRouteImport } from './routes/_authenticated/account.orders.$id'
 
+const SmokeLenisRoute = SmokeLenisRouteImport.update({
+  id: '/smoke-lenis',
+  path: '/smoke-lenis',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ShopRoute = ShopRouteImport.update({
   id: '/shop',
   path: '/shop',
@@ -70,11 +75,6 @@ const ProductSlugRoute = ProductSlugRouteImport.update({
   path: '/product/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SmokeLenisRoute = SmokeLenisRouteImport.update({
-  id: '/_smoke/lenis',
-  path: '/lenis',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AuthenticatedSellerRoute = AuthenticatedSellerRouteImport.update({
   id: '/seller',
   path: '/seller',
@@ -116,11 +116,11 @@ export interface FileRoutesByFullPath {
   '/search': typeof SearchRoute
   '/sell': typeof SellRoute
   '/shop': typeof ShopRoute
+  '/smoke-lenis': typeof SmokeLenisRoute
   '/account': typeof AuthenticatedAccountRouteWithChildren
   '/admin': typeof AuthenticatedAdminRoute
   '/checkout': typeof AuthenticatedCheckoutRoute
   '/seller': typeof AuthenticatedSellerRoute
-  '/lenis': typeof SmokeLenisRoute
   '/product/$slug': typeof ProductSlugRoute
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
   '/account/orders/$id': typeof AuthenticatedAccountOrdersIdRoute
@@ -133,11 +133,11 @@ export interface FileRoutesByTo {
   '/search': typeof SearchRoute
   '/sell': typeof SellRoute
   '/shop': typeof ShopRoute
+  '/smoke-lenis': typeof SmokeLenisRoute
   '/account': typeof AuthenticatedAccountRouteWithChildren
   '/admin': typeof AuthenticatedAdminRoute
   '/checkout': typeof AuthenticatedCheckoutRoute
   '/seller': typeof AuthenticatedSellerRoute
-  '/lenis': typeof SmokeLenisRoute
   '/product/$slug': typeof ProductSlugRoute
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
   '/account/orders/$id': typeof AuthenticatedAccountOrdersIdRoute
@@ -152,11 +152,11 @@ export interface FileRoutesById {
   '/search': typeof SearchRoute
   '/sell': typeof SellRoute
   '/shop': typeof ShopRoute
+  '/smoke-lenis': typeof SmokeLenisRoute
   '/_authenticated/account': typeof AuthenticatedAccountRouteWithChildren
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/checkout': typeof AuthenticatedCheckoutRoute
   '/_authenticated/seller': typeof AuthenticatedSellerRoute
-  '/_smoke/lenis': typeof SmokeLenisRoute
   '/product/$slug': typeof ProductSlugRoute
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
   '/_authenticated/account/orders/$id': typeof AuthenticatedAccountOrdersIdRoute
@@ -171,11 +171,11 @@ export interface FileRouteTypes {
     | '/search'
     | '/sell'
     | '/shop'
+    | '/smoke-lenis'
     | '/account'
     | '/admin'
     | '/checkout'
     | '/seller'
-    | '/lenis'
     | '/product/$slug'
     | '/api/public/razorpay-webhook'
     | '/account/orders/$id'
@@ -188,11 +188,11 @@ export interface FileRouteTypes {
     | '/search'
     | '/sell'
     | '/shop'
+    | '/smoke-lenis'
     | '/account'
     | '/admin'
     | '/checkout'
     | '/seller'
-    | '/lenis'
     | '/product/$slug'
     | '/api/public/razorpay-webhook'
     | '/account/orders/$id'
@@ -206,11 +206,11 @@ export interface FileRouteTypes {
     | '/search'
     | '/sell'
     | '/shop'
+    | '/smoke-lenis'
     | '/_authenticated/account'
     | '/_authenticated/admin'
     | '/_authenticated/checkout'
     | '/_authenticated/seller'
-    | '/_smoke/lenis'
     | '/product/$slug'
     | '/api/public/razorpay-webhook'
     | '/_authenticated/account/orders/$id'
@@ -232,6 +232,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/smoke-lenis': {
+      id: '/smoke-lenis'
+      path: '/smoke-lenis'
+      fullPath: '/smoke-lenis'
+      preLoaderRoute: typeof SmokeLenisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop': {
       id: '/shop'
       path: '/shop'
@@ -293,13 +300,6 @@ declare module '@tanstack/react-router' {
       path: '/product/$slug'
       fullPath: '/product/$slug'
       preLoaderRoute: typeof ProductSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_smoke/lenis': {
-      id: '/_smoke/lenis'
-      path: '/lenis'
-      fullPath: '/lenis'
-      preLoaderRoute: typeof SmokeLenisRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/seller': {

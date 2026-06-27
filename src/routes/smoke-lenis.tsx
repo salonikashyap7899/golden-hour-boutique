@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
-export const Route = createFileRoute("/_smoke/lenis")({
+export const Route = createFileRoute("/smoke-lenis")({
   component: SmokeLenis,
 });
 
