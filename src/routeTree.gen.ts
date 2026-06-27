@@ -18,6 +18,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
+import { Route as SmokeLenisRouteImport } from './routes/_smoke.lenis'
 import { Route as AuthenticatedSellerRouteImport } from './routes/_authenticated/seller'
 import { Route as AuthenticatedCheckoutRouteImport } from './routes/_authenticated/checkout'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
@@ -69,6 +70,11 @@ const ProductSlugRoute = ProductSlugRouteImport.update({
   path: '/product/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SmokeLenisRoute = SmokeLenisRouteImport.update({
+  id: '/_smoke/lenis',
+  path: '/lenis',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedSellerRoute = AuthenticatedSellerRouteImport.update({
   id: '/seller',
   path: '/seller',
@@ -114,6 +120,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRoute
   '/checkout': typeof AuthenticatedCheckoutRoute
   '/seller': typeof AuthenticatedSellerRoute
+  '/lenis': typeof SmokeLenisRoute
   '/product/$slug': typeof ProductSlugRoute
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
   '/account/orders/$id': typeof AuthenticatedAccountOrdersIdRoute
@@ -130,6 +137,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminRoute
   '/checkout': typeof AuthenticatedCheckoutRoute
   '/seller': typeof AuthenticatedSellerRoute
+  '/lenis': typeof SmokeLenisRoute
   '/product/$slug': typeof ProductSlugRoute
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
   '/account/orders/$id': typeof AuthenticatedAccountOrdersIdRoute
@@ -148,6 +156,7 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/checkout': typeof AuthenticatedCheckoutRoute
   '/_authenticated/seller': typeof AuthenticatedSellerRoute
+  '/_smoke/lenis': typeof SmokeLenisRoute
   '/product/$slug': typeof ProductSlugRoute
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
   '/_authenticated/account/orders/$id': typeof AuthenticatedAccountOrdersIdRoute
@@ -166,6 +175,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/checkout'
     | '/seller'
+    | '/lenis'
     | '/product/$slug'
     | '/api/public/razorpay-webhook'
     | '/account/orders/$id'
@@ -182,6 +192,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/checkout'
     | '/seller'
+    | '/lenis'
     | '/product/$slug'
     | '/api/public/razorpay-webhook'
     | '/account/orders/$id'
@@ -199,6 +210,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/checkout'
     | '/_authenticated/seller'
+    | '/_smoke/lenis'
     | '/product/$slug'
     | '/api/public/razorpay-webhook'
     | '/_authenticated/account/orders/$id'
@@ -213,6 +225,7 @@ export interface RootRouteChildren {
   SearchRoute: typeof SearchRoute
   SellRoute: typeof SellRoute
   ShopRoute: typeof ShopRoute
+  SmokeLenisRoute: typeof SmokeLenisRoute
   ProductSlugRoute: typeof ProductSlugRoute
   ApiPublicRazorpayWebhookRoute: typeof ApiPublicRazorpayWebhookRoute
 }
@@ -280,6 +293,13 @@ declare module '@tanstack/react-router' {
       path: '/product/$slug'
       fullPath: '/product/$slug'
       preLoaderRoute: typeof ProductSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_smoke/lenis': {
+      id: '/_smoke/lenis'
+      path: '/lenis'
+      fullPath: '/lenis'
+      preLoaderRoute: typeof SmokeLenisRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/seller': {
@@ -364,19 +384,10 @@ const rootRouteChildren: RootRouteChildren = {
   SearchRoute: SearchRoute,
   SellRoute: SellRoute,
   ShopRoute: ShopRoute,
+  SmokeLenisRoute: SmokeLenisRoute,
   ProductSlugRoute: ProductSlugRoute,
   ApiPublicRazorpayWebhookRoute: ApiPublicRazorpayWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
