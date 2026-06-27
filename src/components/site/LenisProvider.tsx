@@ -9,12 +9,14 @@ export function LenisProvider({ children }: Props) {
     if (typeof window === "undefined") return;
 
     let lenis: any;
-    let rafId: number;
+    let tickerCb: ((time: number) => void) | null = null;
+    let gsapRef: any = null;
 
     const init = async () => {
       const { default: Lenis } = await import("lenis");
       const { ScrollTrigger } = await import("gsap/ScrollTrigger");
       const { gsap } = await import("gsap");
+      gsapRef = gsap;
 
       gsap.registerPlugin(ScrollTrigger);
 
@@ -27,19 +29,18 @@ export function LenisProvider({ children }: Props) {
 
       lenis.on("scroll", ScrollTrigger.update);
 
-      gsap.ticker.add((time: number) => {
+      tickerCb = (time: number) => {
         lenis.raf(time * 1000);
-      });
-
+      };
+      gsap.ticker.add(tickerCb);
       gsap.ticker.lagSmoothing(0);
     };
 
     init();
 
     return () => {
-      if (rafId) cancelAnimationFrame(rafId);
       if (lenis) lenis.destroy();
-      gsap.ticker.remove(() => {});
+      if (gsapRef && tickerCb) gsapRef.ticker.remove(tickerCb);
     };
   }, []);
 

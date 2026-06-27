@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SmokeLenisRouteImport } from './routes/smoke-lenis'
 import { Route as ShopRouteImport } from './routes/shop'
 import { Route as SellRouteImport } from './routes/sell'
 import { Route as SearchRouteImport } from './routes/search'
@@ -25,6 +26,11 @@ import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticate
 import { Route as ApiPublicRazorpayWebhookRouteImport } from './routes/api/public/razorpay-webhook'
 import { Route as AuthenticatedAccountOrdersIdRouteImport } from './routes/_authenticated/account.orders.$id'
 
+const SmokeLenisRoute = SmokeLenisRouteImport.update({
+  id: '/smoke-lenis',
+  path: '/smoke-lenis',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ShopRoute = ShopRouteImport.update({
   id: '/shop',
   path: '/shop',
@@ -110,6 +116,7 @@ export interface FileRoutesByFullPath {
   '/search': typeof SearchRoute
   '/sell': typeof SellRoute
   '/shop': typeof ShopRoute
+  '/smoke-lenis': typeof SmokeLenisRoute
   '/account': typeof AuthenticatedAccountRouteWithChildren
   '/admin': typeof AuthenticatedAdminRoute
   '/checkout': typeof AuthenticatedCheckoutRoute
@@ -126,6 +133,7 @@ export interface FileRoutesByTo {
   '/search': typeof SearchRoute
   '/sell': typeof SellRoute
   '/shop': typeof ShopRoute
+  '/smoke-lenis': typeof SmokeLenisRoute
   '/account': typeof AuthenticatedAccountRouteWithChildren
   '/admin': typeof AuthenticatedAdminRoute
   '/checkout': typeof AuthenticatedCheckoutRoute
@@ -144,6 +152,7 @@ export interface FileRoutesById {
   '/search': typeof SearchRoute
   '/sell': typeof SellRoute
   '/shop': typeof ShopRoute
+  '/smoke-lenis': typeof SmokeLenisRoute
   '/_authenticated/account': typeof AuthenticatedAccountRouteWithChildren
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/checkout': typeof AuthenticatedCheckoutRoute
@@ -162,6 +171,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/sell'
     | '/shop'
+    | '/smoke-lenis'
     | '/account'
     | '/admin'
     | '/checkout'
@@ -178,6 +188,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/sell'
     | '/shop'
+    | '/smoke-lenis'
     | '/account'
     | '/admin'
     | '/checkout'
@@ -195,6 +206,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/sell'
     | '/shop'
+    | '/smoke-lenis'
     | '/_authenticated/account'
     | '/_authenticated/admin'
     | '/_authenticated/checkout'
@@ -213,12 +225,20 @@ export interface RootRouteChildren {
   SearchRoute: typeof SearchRoute
   SellRoute: typeof SellRoute
   ShopRoute: typeof ShopRoute
+  SmokeLenisRoute: typeof SmokeLenisRoute
   ProductSlugRoute: typeof ProductSlugRoute
   ApiPublicRazorpayWebhookRoute: typeof ApiPublicRazorpayWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/smoke-lenis': {
+      id: '/smoke-lenis'
+      path: '/smoke-lenis'
+      fullPath: '/smoke-lenis'
+      preLoaderRoute: typeof SmokeLenisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop': {
       id: '/shop'
       path: '/shop'
@@ -364,19 +384,10 @@ const rootRouteChildren: RootRouteChildren = {
   SearchRoute: SearchRoute,
   SellRoute: SellRoute,
   ShopRoute: ShopRoute,
+  SmokeLenisRoute: SmokeLenisRoute,
   ProductSlugRoute: ProductSlugRoute,
   ApiPublicRazorpayWebhookRoute: ApiPublicRazorpayWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
