@@ -1,1 +1,2 @@
-import "./server.ts";
+import { handler } from "../dist/server/server.js";
+export default handler;

@@ -1,9 +1,9 @@
-// Node.js entry point for Render deployment
-// This file is used by Render's start command with --experimental-strip-types
-import { createServer } from "node:http";
-import handler from "./src/server.ts";
+// Entry point for Render - serves the built TanStack Start app
+import { handler } from "./dist/server/server.js";
 
 const port = Number(process.env.PORT) || 3000;
+
+import { createServer } from "node:http";
 
 const server = createServer(async (req, res) => {
   try {
