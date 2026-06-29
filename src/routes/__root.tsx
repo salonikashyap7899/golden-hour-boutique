@@ -10,14 +10,14 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
-import { reportLovableError } from "../lib/lovable-error-reporting";
-import { CartProvider } from "@/lib/cart";
-import { AuthProvider } from "@/lib/auth";
-import { Header } from "@/components/site/Header";
-import { Footer } from "@/components/site/Footer";
-import { LenisProvider } from "@/components/site/LenisProvider";
-import { PageTransition } from "@/components/site/PageTransition";
-import { CustomCursor } from "@/components/site/CustomCursor";
+import { reportLovableError } from "../lib/lovable-error-reporting.ts";
+import { CartProvider } from "../lib/cart.tsx";
+import { AuthProvider } from "../lib/auth.tsx";
+import { Header } from "../components/site/Header.tsx";
+import { Footer } from "../components/site/Footer.tsx";
+import { LenisProvider } from "../components/site/LenisProvider.tsx";
+import { PageTransition } from "../components/site/PageTransition.tsx";
+import { CustomCursor } from "../components/site/CustomCursor.tsx";
 
 function NotFoundComponent() {
   return (

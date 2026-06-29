@@ -1,8 +1,8 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Search, Heart, ShoppingBag, User, X, Sparkles, Store } from "lucide-react";
 import { useState } from "react";
-import { useCart } from "@/lib/cart";
-import { useAuth } from "@/lib/auth";
+import { useCart } from "../../lib/cart.tsx";
+import { useAuth } from "../../lib/auth.tsx";
 
 export function Header() {
   const { count } = useCart();
