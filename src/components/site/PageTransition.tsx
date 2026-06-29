@@ -12,7 +12,7 @@ export function PageTransition() {
     if (typeof window === "undefined") return;
 
     const init = async () => {
-      const { gsap } = await import("../../lib/gsap-setup.ts");
+      const { gsap } = await import("@/lib/gsap-setup");
       const overlay  = overlayRef.current;
       if (!overlay) return;
 

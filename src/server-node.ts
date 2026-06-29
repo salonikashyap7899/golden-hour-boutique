@@ -1,2 +1,2 @@
-import { handler } from "../dist/server/server.js";
-export default handler;
+// Fallback entry point - use root server-node.ts for Render deployment
+export { default } from "../dist/server/server.js";

@@ -6,10 +6,10 @@ import hero from "@/assets/hero.jpg";
 import catWomen from "@/assets/cat-women.jpg";
 import catMen from "@/assets/cat-men.jpg";
 import catAccessories from "@/assets/cat-accessories.jpg";
-import { PRODUCTS } from "../lib/products.ts";
-import { ProductCard } from "../components/site/ProductCard.tsx";
-import { listPublicProducts } from "../lib/api/catalog.functions.ts";
-import { usePageAnimations } from "../hooks/use-page-animations.tsx";
+import { PRODUCTS } from "@/lib/products";
+import { ProductCard } from "@/components/site/ProductCard";
+import { listPublicProducts } from "@/lib/api/catalog.functions";
+import { usePageAnimations } from "@/hooks/use-page-animations";
 
 export const Route = createFileRoute("/")({
   head: () => ({

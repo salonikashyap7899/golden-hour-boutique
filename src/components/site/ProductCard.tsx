@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Heart } from "lucide-react";
 import { useRef } from "react";
-import { formatINR, type Product } from "../../lib/products.ts";
+import { formatINR, type Product } from "@/lib/products";
 
 export function ProductCard({ product }: { product: Product }) {
   const off = product.compareAt ? Math.round(100 - (product.price / product.compareAt) * 100) : 0;
@@ -10,14 +10,14 @@ export function ProductCard({ product }: { product: Product }) {
   const contentRef = useRef<HTMLDivElement>(null);
 
   const handleMouseEnter = async () => {
-    const { gsap } = await import("../../lib/gsap-setup.ts");
+    const { gsap } = await import("@/lib/gsap-setup");
     if (imageRef.current)   gsap.to(imageRef.current,   { scale: 1.08, duration: 0.65, ease: "power2.out", force3D: true });
     if (contentRef.current) gsap.to(contentRef.current, { opacity: 1,  y: 0,      duration: 0.55, ease: "power2.out" });
     if (cardRef.current)    gsap.to(cardRef.current,    { y: -6,              duration: 0.45, ease: "power2.out" });
   };
 
   const handleMouseLeave = async () => {
-    const { gsap } = await import("../../lib/gsap-setup.ts");
+    const { gsap } = await import("@/lib/gsap-setup");
     if (imageRef.current)   gsap.to(imageRef.current,   { scale: 1, duration: 0.65, ease: "power2.out", force3D: true });
     if (contentRef.current) gsap.to(contentRef.current, { opacity: 0, y: 20, duration: 0.5, ease: "power2.out" });
     if (cardRef.current)    gsap.to(cardRef.current,    { y: 0,              duration: 0.45, ease: "power2.out" });
