@@ -2,6 +2,7 @@ modules = ["nodejs-20", "web"]
 [agent]
 expertMode = true
 stack = "BEST_EFFORT_FALLBACK"
+integrations = ["javascript_database:1.0.0"]
 
 [nix]
 channel = "stable-25_05"
@@ -38,3 +39,11 @@ externalPort = 80
 deploymentTarget = "autoscale"
 run = ["bun", "run", "preview", "--port", "5000", "--host", "0.0.0.0"]
 build = ["bun", "run", "build"]
+
+[userenv]
+
+[userenv.shared]
+SUPABASE_URL = "https://vpbitgeuhwlwaxgtlogk.supabase.co"
+VITE_SUPABASE_URL = "https://vpbitgeuhwlwaxgtlogk.supabase.co"
+TWILIO_FROM_NUMBER = "+14243519087"
+TWILIO_MESSAGING_SERVICE_SID = "MG55722df8a995336aea13df763956ea91"

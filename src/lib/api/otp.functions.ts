@@ -15,9 +15,9 @@ function synthEmail(phone: string) {
 }
 
 async function sendTwilioSms(to: string, body: string) {
-  const key = process.env.LOVABLE_API_KEY;
-  const conn = process.env.TWILIO_API_KEY;
-  if (!key || !conn) throw new Error("Twilio connector not configured");
+  const accountSid = process.env.TWILIO_ACCOUNT_SID?.trim();
+  const authToken = process.env.TWILIO_AUTH_TOKEN?.trim();
+  if (!accountSid || !authToken) throw new Error("Twilio credentials not configured (TWILIO_ACCOUNT_SID / TWILIO_AUTH_TOKEN)");
 
   const from = process.env.TWILIO_FROM_NUMBER?.trim();
   const msid = process.env.TWILIO_MESSAGING_SERVICE_SID?.trim();
@@ -31,11 +31,11 @@ async function sendTwilioSms(to: string, body: string) {
   if (msid) params.MessagingServiceSid = msid;
   else if (from) params.From = from;
 
-  const res = await fetch("https://connector-gateway.lovable.dev/twilio/Messages.json", {
+  const credentials = Buffer.from(`${accountSid}:${authToken}`).toString("base64");
+  const res = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`, {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${key}`,
-      "X-Connection-Api-Key": conn,
+      Authorization: `Basic ${credentials}`,
       "Content-Type": "application/x-www-form-urlencoded",
     },
     body: new URLSearchParams(params).toString(),
