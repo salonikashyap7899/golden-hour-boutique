@@ -24,7 +24,9 @@ The Replit workflow **Start application** runs `bun run dev --port 5000 --host 0
 
 ## Environment variables
 
-All required env vars are in `.env` (committed). Razorpay keys are placeholders (`rzp_live_xxx`) and must be replaced with real credentials before payments work.
+Sensitive credentials are stored as **Replit Secrets** (never committed). Non-sensitive values (`SUPABASE_URL`, `TWILIO_FROM_NUMBER`, etc.) live in `.env`, which is git-ignored. Use `.env.example` as a template — copy it to `.env` locally and fill in real values; add secrets via Replit's Secrets panel.
+
+Razorpay keys are still placeholders — replace them via Replit Secrets before going live.
 
 | Variable | Purpose |
 |---|---|
