@@ -66,8 +66,10 @@ async function startServer() {
       const url = new URL(req.url ?? "/", `http://${req.headers.host}`);
       const pathname = url.pathname;
       
-      // Serve static assets from dist/client
-      if (pathname.startsWith("/_") || /\.(js|css|png|jpg|jpeg|gif|svg|webp|woff|woff2|ttf|eot|json)$/.test(pathname)) {
+      // Serve static assets from dist/client (extension-based only).
+      // IMPORTANT: do NOT intercept /_server or other /_* paths here —
+      // those are TanStack Start server-function endpoints handled by the SSR handler.
+      if (/\.(js|css|png|jpg|jpeg|gif|svg|webp|woff|woff2|ttf|eot|json|ico|txt|xml|map)$/.test(pathname)) {
         const filePath = resolve(__dirname, "dist/client", pathname.replace(/^\//, ""));
         const staticResponse = serveStaticFile(filePath);
         res.writeHead(staticResponse.status, staticResponse.headers);
