@@ -55,18 +55,20 @@ export const sendPhoneOtp = createServerFn({ method: "POST" })
 
     // Rate limit: max 5 requests / 10 min
     const since = new Date(Date.now() - 10 * 60_000).toISOString();
-    const { count } = await supabaseAdmin
+    const { count, error: rateErr } = await supabaseAdmin
       .from("phone_otps")
       .select("id", { count: "exact", head: true })
       .eq("phone", phone)
       .gte("created_at", since);
+    if (rateErr) throw new Error(`DB error (rate check): ${rateErr.message}`);
     if ((count ?? 0) >= 5) throw new Error("Too many requests. Try again in a few minutes.");
 
-    await supabaseAdmin.from("phone_otps").insert({
+    const { error: insertErr } = await supabaseAdmin.from("phone_otps").insert({
       phone,
       otp_hash: hash(otp, phone),
       expires_at: new Date(Date.now() + 5 * 60_000).toISOString(),
     });
+    if (insertErr) throw new Error(`DB error (save OTP): ${insertErr.message}`);
 
     await sendTwilioSms(phone, `Your Maison verification code is ${otp}. Valid for 5 minutes.`);
     return { ok: true };

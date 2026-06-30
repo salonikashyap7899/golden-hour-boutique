@@ -7,14 +7,12 @@ const errorMiddleware = createMiddleware().server(async ({ next }) => {
   try {
     return await next();
   } catch (error) {
-    if (error != null && typeof error === "object" && "statusCode" in error) {
-      throw error;
-    }
+    // Always re-throw so TanStack Start can handle the error natively:
+    //   - server functions: serialized as JSON and returned to the client
+    //   - page routes: rendered through React error boundaries
+    // Catastrophic SSR failures are caught by normalizeCatastrophicSsrResponse in server.ts.
     console.error(error);
-    return new Response(renderErrorPage(), {
-      status: 500,
-      headers: { "content-type": "text/html; charset=utf-8" },
-    });
+    throw error;
   }
 });
 
