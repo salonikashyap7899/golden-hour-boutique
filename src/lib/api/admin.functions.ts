@@ -154,6 +154,40 @@ export const adminListReturns = createServerFn({ method: "GET" })
     return data ?? [];
   });
 
+export const adminListCategories = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data } = await supabaseAdmin.from("categories").select("*").order("sort_order", { ascending: true });
+    return data ?? [];
+  });
+
+export const adminSaveCategory = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({
+      id: z.string().uuid().optional(),
+      slug: z.string().min(2).max(80),
+      name: z.string().min(1).max(120),
+      description: z.string().max(500).optional(),
+      image_url: z.string().optional(),
+      sort_order: z.number().int().default(0),
+      is_active: z.boolean().default(true),
+    }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const payload = { slug: data.slug, name: data.name, description: data.description ?? null, image_url: data.image_url ?? null, sort_order: data.sort_order, is_active: data.is_active };
+    if (data.id) {
+      await supabaseAdmin.from("categories").update(payload).eq("id", data.id);
+    } else {
+      await supabaseAdmin.from("categories").insert(payload);
+    }
+    return { ok: true };
+  });
+
 export const adminUpdateReturn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) =>

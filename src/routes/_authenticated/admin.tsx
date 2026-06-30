@@ -7,6 +7,7 @@ import {
   adminListAllOrders, adminUpdateOrderStatus, verifyDeliveryOtp,
   adminListProducts, adminSaveProduct,
   adminListReturns, adminUpdateReturn,
+  adminListCategories, adminSaveCategory,
 } from "@/lib/api/admin.functions";
 import { formatINR } from "@/lib/products";
 
@@ -19,7 +20,7 @@ function AdminPage() {
   const checkFn = useServerFn(checkIsAdmin);
   const bootFn = useServerFn(bootstrapAdmin);
   const isAdminQ = useQuery({ queryKey: ["is-admin-page"], queryFn: () => checkFn() });
-  const [tab, setTab] = useState<"orders"|"products"|"returns">("orders");
+  const [tab, setTab] = useState<"orders"|"products"|"categories"|"returns">("orders");
 
   if (isAdminQ.isLoading) return <main className="p-12 text-sm text-muted-foreground">Loading…</main>;
   if (!isAdminQ.data?.is_admin) {
@@ -38,12 +39,13 @@ function AdminPage() {
         <h1 className="text-display text-5xl mt-3">Atelier control</h1>
       </div>
       <div className="flex gap-6 border-b hairline mb-8 text-sm">
-        {(["orders","products","returns"] as const).map((t) => (
+        {(["orders","products","categories","returns"] as const).map((t) => (
           <button key={t} onClick={()=>setTab(t)} className={`pb-3 capitalize ${tab===t?"border-b-2 border-foreground -mb-px":"text-muted-foreground"}`}>{t}</button>
         ))}
       </div>
       {tab === "orders" && <OrdersTab />}
       {tab === "products" && <ProductsTab />}
+      {tab === "categories" && <CategoriesTab />}
       {tab === "returns" && <ReturnsTab />}
     </main>
   );
@@ -61,6 +63,8 @@ function OrdersTab() {
     try { await updFn({ data: { order_id: orderId, status, tracking_number: tracking } }); await q.refetch(); }
     finally { setBusy(null); }
   }
+
+  if (!q.data?.length) return <div className="text-sm text-muted-foreground py-12 text-center">No orders yet.</div>;
 
   return (
     <div className="space-y-3">
@@ -157,10 +161,90 @@ function ProductsTab() {
   );
 }
 
+function CategoriesTab() {
+  const listFn = useServerFn(adminListCategories);
+  const saveFn = useServerFn(adminSaveCategory);
+  const q = useQuery({ queryKey: ["admin-categories"], queryFn: () => listFn() });
+  const blank = { slug: "", name: "", description: "", image_url: "", sort_order: 0, is_active: true };
+  const [edit, setEdit] = useState<any | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  async function save() {
+    setSaving(true);
+    try { await saveFn({ data: edit }); setEdit(null); q.refetch(); }
+    finally { setSaving(false); }
+  }
+
+  return (
+    <div className="grid lg:grid-cols-[1fr_380px] gap-8">
+      <div className="space-y-3">
+        <button onClick={() => setEdit(blank)} className="btn-gold">+ New category</button>
+        {(q.data ?? []).map((c: any) => (
+          <button key={c.id} onClick={() => setEdit({ id: c.id, slug: c.slug, name: c.name, description: c.description ?? "", image_url: c.image_url ?? "", sort_order: c.sort_order, is_active: c.is_active })}
+            className="w-full text-left border hairline p-4 flex justify-between items-center hover:border-foreground transition-colors">
+            <span className="flex items-center gap-4">
+              {c.image_url && <img src={c.image_url} className="h-10 w-10 object-cover" alt={c.name} />}
+              <span>
+                <span className="block text-sm font-medium">{c.name}</span>
+                <span className="block text-xs text-muted-foreground">{c.slug} · order {c.sort_order}</span>
+              </span>
+            </span>
+            <span className={`text-eyebrow text-xs ${c.is_active ? "text-accent" : "text-destructive"}`}>
+              {c.is_active ? "Active" : "Hidden"}
+            </span>
+          </button>
+        ))}
+        {q.data?.length === 0 && (
+          <div className="text-sm text-muted-foreground py-12 text-center border hairline">
+            No categories yet. Add one to get started.
+          </div>
+        )}
+      </div>
+
+      {edit && (
+        <aside className="border hairline p-6 space-y-4 sticky top-28 self-start">
+          <h3 className="text-display text-xl">{edit.id ? "Edit category" : "New category"}</h3>
+          {[["Name", "name"], ["Slug", "slug"], ["Image URL", "image_url"]].map(([l, k]) => (
+            <label key={k} className="block">
+              <span className="text-eyebrow block mb-1">{l}</span>
+              <input value={edit[k] ?? ""} onChange={(e) => setEdit({ ...edit, [k]: e.target.value })}
+                className="w-full bg-background border hairline px-3 py-2 text-sm" />
+            </label>
+          ))}
+          <label className="block">
+            <span className="text-eyebrow block mb-1">Description</span>
+            <textarea value={edit.description ?? ""} onChange={(e) => setEdit({ ...edit, description: e.target.value })}
+              rows={2} className="w-full bg-background border hairline px-3 py-2 text-sm" />
+          </label>
+          <label className="block">
+            <span className="text-eyebrow block mb-1">Sort order</span>
+            <input type="number" value={edit.sort_order} onChange={(e) => setEdit({ ...edit, sort_order: Number(e.target.value) })}
+              className="w-full bg-background border hairline px-3 py-2 text-sm" />
+          </label>
+          {edit.image_url && (
+            <img src={edit.image_url} alt="Preview" className="w-full aspect-video object-cover border hairline" />
+          )}
+          <label className="flex items-center gap-2 text-sm">
+            <input type="checkbox" checked={edit.is_active} onChange={(e) => setEdit({ ...edit, is_active: e.target.checked })} />
+            Active (visible on site)
+          </label>
+          <div className="flex gap-3 pt-2">
+            <button onClick={save} disabled={saving} className="btn-gold">{saving ? "Saving…" : "Save"}</button>
+            <button onClick={() => setEdit(null)} className="btn-outline-dark">Cancel</button>
+          </div>
+        </aside>
+      )}
+    </div>
+  );
+}
+
 function ReturnsTab() {
   const listFn = useServerFn(adminListReturns);
   const updFn = useServerFn(adminUpdateReturn);
   const q = useQuery({ queryKey: ["admin-returns"], queryFn: () => listFn() });
+
+  if (!q.data?.length) return <div className="text-sm text-muted-foreground py-12 text-center">No return requests yet.</div>;
+
   return (
     <div className="space-y-3">
       {(q.data ?? []).map((r: any) => (
