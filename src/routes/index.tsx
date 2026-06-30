@@ -364,6 +364,161 @@ function Index() {
         </div>
       </section>
 
+      {/* ── THE CRAFT ── */}
+      <section className="mx-auto max-w-[1400px] px-6 lg:px-10 mt-28 md:mt-40">
+        <div className="gsap-reveal" data-dir="up">
+          <div className="text-center mb-16">
+            <div className="text-eyebrow text-accent mb-4">How we make it</div>
+            <h2 className="text-display text-4xl md:text-5xl">The craft</h2>
+          </div>
+        </div>
+        <div className="gsap-stagger-group grid md:grid-cols-3 gap-0 border border-white/[0.07]">
+          {([
+            ["01", "Sourced with intent", "Every material travels to Mumbai from its origin — mulberry silk from Assam, cashmere from Mongolian highlands, leather from Florentine tanneries aged over 60 years."],
+            ["02", "Cut & constructed by hand", "Each piece is cut on the same tables we've used since 1998. A single jacket takes up to 40 hours across eight artisans — no shortcuts, no machine finishes."],
+            ["03", "Inspected, then delivered", "Before dispatch, every garment passes a 22-point atelier inspection. We ship in archival tissue and a reusable cloth bag — part of our lifetime care promise."],
+          ] as const).map(([num, title, body]) => (
+            <div key={num} className="p-10 md:p-12 border-b md:border-b-0 md:border-r border-white/[0.07] last:border-0">
+              <div className="text-display text-6xl text-white/[0.06] mb-6 leading-none select-none">{num}</div>
+              <div className="text-eyebrow text-accent mb-3">{title}</div>
+              <p className="text-[14px] leading-[1.9] text-foreground/45">{body}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── MATERIALS STRIP ── */}
+      <section className="mt-28 md:mt-40 bg-midnight2 border-y border-white/[0.06] py-16 md:py-20">
+        <div className="mx-auto max-w-[1400px] px-6 lg:px-10">
+          <div className="gsap-reveal" data-dir="up">
+            <div className="text-center mb-12">
+              <div className="text-eyebrow text-accent mb-4">What we work with</div>
+              <h2 className="text-display text-3xl md:text-4xl">Materials of distinction</h2>
+            </div>
+          </div>
+          <div className="gsap-stagger-group grid grid-cols-2 md:grid-cols-4 gap-6">
+            {([
+              ["Mulberry Silk", "Assam, India", "Harvested by hand, woven at 300 threads per inch."],
+              ["Mongolian Cashmere", "Ulaanbaatar", "Grade A, dehaired to 14 microns. Impossibly soft."],
+              ["Vegetable-tanned Leather", "Florence, Italy", "60-year-old tanneries. Patinas beautifully over time."],
+              ["18K Gold", "Jaipur, India", "Hallmarked. Each piece set by a single craftsperson."],
+            ] as const).map(([mat, origin, desc]) => (
+              <div key={mat} className="p-6 border border-white/[0.08] hover:border-accent/30 transition-colors duration-500">
+                <div className="text-eyebrow text-accent/60 text-[10px] mb-3">{origin}</div>
+                <div className="font-serif text-lg text-foreground/90 mb-3">{mat}</div>
+                <p className="text-[12px] leading-relaxed text-foreground/40">{desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── TESTIMONIALS ── */}
+      <section className="mx-auto max-w-[1400px] px-6 lg:px-10 mt-28 md:mt-40">
+        <div className="gsap-reveal" data-dir="up">
+          <div className="text-center mb-14">
+            <div className="text-eyebrow text-accent mb-4">Our clients</div>
+            <h2 className="text-display text-4xl md:text-5xl">Worn & loved</h2>
+          </div>
+        </div>
+        <div className="gsap-stagger-group grid md:grid-cols-3 gap-6">
+          {([
+            ["The Aurelia gown arrived in the most beautiful archival packaging I've ever seen. I wore it to a gallery opening in Delhi — every person asked where it was from.", "Priya M.", "Mumbai · Regular client"],
+            ["I've been buying luxury menswear for 20 years. Maison's tailoring stands up to anything from Milan. The cashmere coat is extraordinary — it only gets better with age.", "Arjun S.", "Delhi · 4 pieces owned"],
+            ["Ordered the silk blouse and it arrived in two days, perfectly inspected. Returned something once — they sorted it within 24 hours, no questions, no fuss.", "Simran K.", "Bengaluru · New client"],
+          ] as const).map(([quote, name, detail]) => (
+            <div key={name} className="p-8 md:p-10 border border-white/[0.08] flex flex-col justify-between gap-8 hover:border-accent/20 transition-colors duration-500">
+              <p className="font-serif text-[17px] leading-[1.75] text-foreground/70 italic">"{quote}"</p>
+              <div>
+                <div className="text-sm text-foreground/80">{name}</div>
+                <div className="text-eyebrow text-foreground/30 mt-1">{detail}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── LOOKBOOK GRID ── */}
+      <section className="mx-auto max-w-[1400px] px-6 lg:px-10 mt-28 md:mt-40">
+        <div className="gsap-reveal" data-dir="up">
+          <div className="flex items-end justify-between gap-6 mb-12">
+            <div>
+              <div className="text-eyebrow text-accent mb-3">Autumn 2026</div>
+              <h2 className="text-display text-4xl md:text-5xl">The lookbook</h2>
+            </div>
+            <Link to="/shop" className="link-underline text-eyebrow text-foreground/50 hidden md:inline-block">Shop the edit</Link>
+          </div>
+        </div>
+        <div className="gsap-stagger-group grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+          <div className="col-span-2 row-span-2 aspect-[4/5] overflow-hidden bg-midnight2 relative group">
+            <img src={catWomen} alt="Women's collection" loading="lazy" className="h-full w-full object-cover transition-transform duration-[1.4s] ease-out group-hover:scale-[1.04]" />
+            <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, transparent 50%, oklch(0 0 0 / 0.55))" }} />
+            <div className="absolute bottom-6 left-6">
+              <div className="text-eyebrow text-foreground/60 mb-1">Women</div>
+              <div className="font-serif text-xl text-foreground">The Atelier Collection</div>
+            </div>
+          </div>
+          <div className="aspect-square overflow-hidden bg-midnight2 relative group">
+            <img src={catMen} alt="Men's collection" loading="lazy" className="h-full w-full object-cover transition-transform duration-[1.4s] ease-out group-hover:scale-[1.04]" />
+            <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, transparent 40%, oklch(0 0 0 / 0.5))" }} />
+            <div className="absolute bottom-4 left-4">
+              <div className="font-serif text-base text-foreground">Men</div>
+            </div>
+          </div>
+          <div className="aspect-square overflow-hidden bg-midnight2 relative group">
+            <img src={catAccessories} alt="Accessories" loading="lazy" className="h-full w-full object-cover transition-transform duration-[1.4s] ease-out group-hover:scale-[1.04]" />
+            <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, transparent 40%, oklch(0 0 0 / 0.5))" }} />
+            <div className="absolute bottom-4 left-4">
+              <div className="font-serif text-base text-foreground">Accessories</div>
+            </div>
+          </div>
+          <div className="aspect-square overflow-hidden bg-midnight2 relative group">
+            <img src={hero} alt="Hero campaign" loading="lazy" className="h-full w-full object-cover object-[62%_top] transition-transform duration-[1.4s] ease-out group-hover:scale-[1.04]" />
+            <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, transparent 40%, oklch(0 0 0 / 0.5))" }} />
+            <div className="absolute bottom-4 left-4">
+              <div className="font-serif text-base text-foreground">Evening</div>
+            </div>
+          </div>
+          <div className="aspect-square bg-midnight2 flex items-center justify-center border border-white/[0.06] hover:border-accent/30 transition-colors duration-500 group cursor-pointer">
+            <Link to="/shop" className="text-center p-6">
+              <div className="font-serif text-2xl text-foreground/60 group-hover:text-foreground transition-colors duration-300">View all</div>
+              <div className="text-eyebrow text-accent mt-2">Shop the edit →</div>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── NEWSLETTER ── */}
+      <section className="mt-28 md:mt-40 bg-midnight2 border-y border-white/[0.06]">
+        <div className="mx-auto max-w-[1400px] px-6 lg:px-10 py-24 md:py-32 grid md:grid-cols-2 gap-12 items-center">
+          <div className="gsap-reveal" data-dir="left">
+            <div className="text-eyebrow text-accent mb-5">The Maison letter</div>
+            <h2 className="text-display text-4xl md:text-5xl mb-5">First to know.</h2>
+            <p className="text-[14px] leading-[1.9] text-foreground/45 max-w-sm">
+              New collections, atelier notes, and exclusive access — delivered when it matters. No noise, no weekly blasts. Just the things worth knowing.
+            </p>
+          </div>
+          <div className="gsap-reveal" data-dir="right">
+            <form
+              onSubmit={(e) => e.preventDefault()}
+              className="flex flex-col sm:flex-row gap-3"
+            >
+              <input
+                type="email"
+                placeholder="your@email.com"
+                className="flex-1 bg-transparent border border-white/20 px-5 py-3.5 text-sm text-foreground placeholder:text-foreground/30 focus:outline-none focus:border-accent transition-colors duration-300"
+              />
+              <button type="submit" className="btn-gold whitespace-nowrap">
+                Subscribe
+              </button>
+            </form>
+            <p className="text-[11px] text-foreground/25 mt-4 leading-relaxed">
+              We respect your privacy. Unsubscribe at any time. No spam — ever.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* ── TRUST STRIP ── */}
       <section className="mx-auto max-w-[1400px] px-6 lg:px-10">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 py-14 border-b border-white/[0.07]">

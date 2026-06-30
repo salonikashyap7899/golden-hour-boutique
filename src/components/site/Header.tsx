@@ -15,7 +15,7 @@ export function Header() {
     <>
       <header className="sticky top-0 z-40 bg-midnight/80 backdrop-blur-xl border-b border-white/[0.07]">
         <div className="hidden md:flex justify-center text-eyebrow py-2 text-accent/70 tracking-[0.3em]">
-          Complimentary shipping on orders above ₹4,999 · Atelier collection — new arrivals
+          Free shipping on orders above ₹4,999 · 30-day returns · Handcrafted in Mumbai · New: Autumn 2026 collection
         </div>
         <div className="mx-auto max-w-[1400px] px-6 lg:px-10 flex items-center justify-between h-16 md:h-20 relative">
           <nav className="hidden md:flex items-center gap-8 text-[0.72rem] tracking-[0.26em] uppercase text-foreground/70">
