@@ -2,8 +2,59 @@
 // Render runs: node --experimental-strip-types server-node.ts
 // This file imports the compiled server output after `bun run build`
 import { createServer } from "node:http";
+import { readFileSync, existsSync } from "node:fs";
+import { resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
+const __dirname = resolve(fileURLToPath(import.meta.url), "..");
 const port = Number(process.env.PORT) || 3000;
+
+// MIME types for common file extensions
+const mimeTypes: Record<string, string> = {
+  ".js": "application/javascript",
+  ".css": "text/css",
+  ".json": "application/json",
+  ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".gif": "image/gif",
+  ".svg": "image/svg+xml",
+  ".webp": "image/webp",
+  ".woff": "font/woff",
+  ".woff2": "font/woff2",
+  ".ttf": "font/ttf",
+  ".eot": "application/vnd.ms-fontobject",
+};
+
+function getMimeType(filePath: string): string {
+  const ext = filePath.substring(filePath.lastIndexOf(".")).toLowerCase();
+  return mimeTypes[ext] || "application/octet-stream";
+}
+
+function serveStaticFile(filePath: string): { status: number; headers: Record<string, string>; body: Buffer } {
+  try {
+    const normalizedPath = resolve(filePath);
+    // Security: ensure the path is within dist/client
+    if (!normalizedPath.startsWith(resolve(__dirname, "dist/client"))) {
+      return { status: 403, headers: { "Content-Type": "text/plain" }, body: Buffer.from("Forbidden") };
+    }
+    if (!existsSync(normalizedPath)) {
+      return { status: 404, headers: { "Content-Type": "text/plain" }, body: Buffer.from("Not Found") };
+    }
+    const content = readFileSync(normalizedPath);
+    return {
+      status: 200,
+      headers: {
+        "Content-Type": getMimeType(normalizedPath),
+        "Cache-Control": "public, max-age=31536000, immutable",
+      },
+      body: content,
+    };
+  } catch (error) {
+    console.error("Error serving static file:", error);
+    return { status: 500, headers: { "Content-Type": "text/plain" }, body: Buffer.from("Internal Server Error") };
+  }
+}
 
 async function startServer() {
   // Import the compiled server handler from the build output
@@ -13,6 +64,17 @@ async function startServer() {
   const server = createServer(async (req, res) => {
     try {
       const url = new URL(req.url ?? "/", `http://${req.headers.host}`);
+      const pathname = url.pathname;
+      
+      // Serve static assets from dist/client
+      if (pathname.startsWith("/_") || /\.(js|css|png|jpg|jpeg|gif|svg|webp|woff|woff2|ttf|eot|json)$/.test(pathname)) {
+        const filePath = resolve(__dirname, "dist/client", pathname.replace(/^\//, ""));
+        const staticResponse = serveStaticFile(filePath);
+        res.writeHead(staticResponse.status, staticResponse.headers);
+        res.end(staticResponse.body);
+        return;
+      }
+      
       const headers = new Headers();
       for (const [key, value] of Object.entries(req.headers)) {
         if (typeof value === "string") headers.set(key, value);
