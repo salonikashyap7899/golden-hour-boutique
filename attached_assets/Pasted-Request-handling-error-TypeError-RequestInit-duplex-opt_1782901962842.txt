@@ -1,0 +1,48 @@
+Request handling error: TypeError: RequestInit: duplex option is required when sending a body.
+    at new Request (node:internal/deps/undici/undici:12057:19)
+    at Server.<anonymous> (file:///opt/render/project/src/server-node.ts:87:23)
+    at Server.emit (node:events:508:28)
+    at parserOnIncoming (node:_http_server:1210:12)
+    at HTTPParser.parserOnHeadersComplete (node:_http_common:125:17)
+Request handling error: TypeError: RequestInit: duplex option is required when sending a body.
+    at new Request (node:internal/deps/undici/undici:12057:19)
+    at Server.<anonymous> (file:///opt/render/project/src/server-node.ts:87:23)
+    at Server.emit (node:events:508:28)
+    at parserOnIncoming (node:_http_server:1210:12)
+    at HTTPParser.parserOnHeadersComplete (node:_http_common:125:17)
+Request handling error: TypeError: RequestInit: duplex option is required when sending a body.
+    at new Request (node:internal/deps/undici/undici:12057:19)
+    at Server.<anonymous> (file:///opt/render/project/src/server-node.ts:87:23)
+    at Server.emit (node:events:508:28)
+    at parserOnIncoming (node:_http_server:1210:12)
+    at HTTPParser.parserOnHeadersComplete (node:_http_common:125:17)
+Request handling error: TypeError: RequestInit: duplex option is required when sending a body.
+    at new Request (node:internal/deps/undici/undici:12057:19)
+    at Server.<anonymous> (file:///opt/render/project/src/server-node.ts:87:23)
+    at Server.emit (node:events:508:28)
+    at parserOnIncoming (node:_http_server:1210:12)
+    at HTTPParser.parserOnHeadersComplete (node:_http_common:125:17)
+Request handling error: TypeError: RequestInit: duplex option is required when sending a body.
+    at new Request (node:internal/deps/undici/undici:12057:19)
+    at Server.<anonymous> (file:///opt/render/project/src/server-node.ts:87:23)
+    at Server.emit (node:events:508:28)
+    at parserOnIncoming (node:_http_server:1210:12)
+    at HTTPParser.parserOnHeadersComplete (node:_http_common:125:17)
+Request handling error: TypeError: RequestInit: duplex option is required when sending a body.
+    at new Request (node:internal/deps/undici/undici:12057:19)
+    at Server.<anonymous> (file:///opt/render/project/src/server-node.ts:87:23)
+    at Server.emit (node:events:508:28)
+    at parserOnIncoming (node:_http_server:1210:12)
+    at HTTPParser.parserOnHeadersComplete (node:_http_common:125:17)
+Request handling error: TypeError: RequestInit: duplex option is required when sending a body.
+    at new Request (node:internal/deps/undici/undici:12057:19)
+    at Server.<anonymous> (file:///opt/render/project/src/server-node.ts:87:23)
+    at Server.emit (node:events:508:28)
+    at parserOnIncoming (node:_http_server:1210:12)
+    at HTTPParser.parserOnHeadersComplete (node:_http_common:125:17)
+Request handling error: TypeError: RequestInit: duplex option is required when sending a body.
+    at new Request (node:internal/deps/undici/undici:12057:19)
+    at Server.<anonymous> (file:///opt/render/project/src/server-node.ts:87:23)
+    at Server.emit (node:events:508:28)
+    at parserOnIncoming (node:_http_server:1210:12)
+    at HTTPParser.parserOnHeadersComplete (node:_http_common:125:17)

@@ -88,7 +88,9 @@ async function startServer() {
         method: req.method,
         headers,
         body: ["GET", "HEAD"].includes(req.method ?? "GET") ? undefined : req,
-      });
+        // Required in Node.js 18+ when the body is a stream (ReadableStream / IncomingMessage)
+        duplex: "half",
+      } as RequestInit);
       const response = await handler.fetch(request, process.env, {});
       const resHeaders: Record<string, string> = {};
       response.headers.forEach((value: string, key: string) => {
